@@ -1,0 +1,81 @@
+<!--
+PLACEHOLDER — reconstructed from a screenshot, NOT the real site markup.
+Replace this file once the actual HTML/CSS for the Navbar is available.
+
+This describes a SHARED component (the Navbar), not a standalone page —
+it appears at the top of every page: Home, Shop, Blog, Category, Product,
+Quote, etc. "Services" is a hover-triggered dropdown, same pattern as the
+mega-menu already seen under "Shop" in home.html.
+-->
+
+<header class="navbar">
+  <div class="navbar-inner container-wide">
+    <a href="/" class="logo">THE CARPET CELLAR</a>
+
+    <nav class="nav-links">
+      <a href="/">Home</a>
+
+      <div class="nav-item has-dropdown">
+        <a href="/shop">Shop <span class="caret">˅</span></a>
+        <!-- full mega-menu already captured in home.html -->
+      </div>
+
+      <div class="nav-item has-dropdown is-active">
+        <a href="/services">Services <span class="caret">˅</span></a>
+        <!-- underline shown under this item while hovered/active -->
+        <div class="dropdown-panel services-dropdown">
+          <a href="/choose-your-rug">Choose your rug</a>
+          <a href="/herbal-washing">Herbal Washing</a>
+          <a href="/restoration">Rug Restoration</a>
+          <a href="/customize-your-rug">Customize your Rug</a>
+          <a href="/book-an-appointment">Book An Appointment</a>
+          <a href="/faqs">FAQs</a>
+        </div>
+      </div>
+
+      <div class="nav-item has-dropdown">
+        <a href="/about">About <span class="caret">˅</span></a>
+        <div class="dropdown-panel">
+          <a href="/our-story">Our Story</a>
+          <a href="/our-showrooms">Our Showrooms</a>
+        </div>
+      </div>
+
+      <a href="/blog">Blog</a>
+    </nav>
+
+    <a href="/account" class="account-icon" aria-label="Account">
+      <!-- person icon -->
+    </a>
+  </div>
+</header>
+
+<style>
+/*
+  Approximate values read off the screenshot — verify against real CSS
+  once available. Cream/beige tones match --minimog-color-sub-menu-background
+  (rgb(237,233,222)) already seen in home.html's inline styles.
+*/
+.navbar { background: #EDE9DE; padding: 20px 0; }
+.logo { font-family: serif; font-size: 28px; letter-spacing: 2px; text-align: center; display: block; }
+.nav-links { display: flex; justify-content: center; gap: 32px; margin-top: 14px; }
+.nav-item.is-active > a,
+.nav-links a:hover { text-decoration: underline; }
+
+.dropdown-panel {
+  position: absolute;
+  background: rgb(237,233,222);
+  box-shadow: 0 0 30px rgba(0,0,0,0.06);
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 220px;
+}
+.dropdown-panel a { color: #333; }
+.dropdown-panel a:hover { color: #000; }
+
+/* Shown on hover of the parent .nav-item (desktop) */
+.nav-item .dropdown-panel { display: none; }
+.nav-item:hover .dropdown-panel { display: flex; }
+</style>

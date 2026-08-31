@@ -1,0 +1,96 @@
+<!--
+PLACEHOLDER — no real HTML provided yet for the About Us page.
+Built to roughly match the brand's existing design tokens seen in
+home.html / shop.html (cream header, serif display font for headings,
+--minimog-color-primary: #DA3F3F accent, Nunito body text).
+Replace this file once real content/markup is available.
+-->
+
+<!-- Shared Navbar + Services dropdown: see services-dropdown-navbar.html -->
+
+<div id="page-title-bar" class="page-title-bar">
+  <div class="page-title-bar-inner container-wide">
+    <h1 class="heading">About Us</h1>
+    <ul class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li>About Us</li>
+    </ul>
+  </div>
+</div>
+
+<section class="about-intro container-wide">
+  <div class="about-intro-grid">
+    <div class="about-intro-image">
+      <!-- placeholder image slot -->
+      <img src="/placeholder-about.jpg" alt="Our showroom" />
+    </div>
+    <div class="about-intro-text">
+      <h2>Our Story</h2>
+      <p>
+        A short paragraph introducing the business — who we are, how long
+        we've been sourcing/making carpets, and what makes the collection
+        distinct. (Replace with real copy once provided.)
+      </p>
+      <p>
+        A second paragraph on craftsmanship, sourcing, or values —
+        whatever the client wants to lead with.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="about-values container-wide">
+  <h2>Why choose us</h2>
+  <div class="values-grid">
+    <div class="value-card">
+      <h3>Hand-selected pieces</h3>
+      <p>Short supporting line.</p>
+    </div>
+    <div class="value-card">
+      <h3>Quality guaranteed</h3>
+      <p>Short supporting line.</p>
+    </div>
+    <div class="value-card">
+      <h3>Personal service</h3>
+      <p>Short supporting line.</p>
+    </div>
+  </div>
+</section>
+
+<section class="about-showroom container-wide">
+  <h2>Visit our showroom</h2>
+  <p>Address, opening hours, and a call-to-action to book an appointment
+     or get a quote — reuse the same Settings data (phone/address) already
+     defined in the site's data layer.</p>
+</section>
+
+<!-- Shared Footer -->
+
+<style>
+/* Approximate tokens — verify against real CSS once home/shop CSS is confirmed */
+.page-title-bar { background: #F4F2EB; padding: 60px 0; text-align: center; }
+.page-title-bar .heading { font-family: 'Jost', serif; font-size: 42px; color: #000; }
+.breadcrumb { display: flex; justify-content: center; gap: 8px; color: #666; margin-top: 10px; }
+
+.container-wide { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+.about-intro { padding: 80px 0; }
+.about-intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.about-intro-text h2 { font-family: 'Jost', serif; font-size: 32px; margin-bottom: 20px; }
+.about-intro-text p { color: #666; line-height: 1.8; margin-bottom: 16px; }
+
+.about-values { padding: 60px 0; background: #F8F8F8; }
+.about-values h2 { text-align: center; font-family: 'Jost', serif; font-size: 28px; margin-bottom: 40px; }
+.values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.value-card { text-align: center; }
+.value-card h3 { font-size: 18px; margin-bottom: 8px; }
+.value-card p { color: #666; font-size: 14px; }
+
+.about-showroom { padding: 80px 0; text-align: center; }
+.about-showroom h2 { font-family: 'Jost', serif; font-size: 28px; margin-bottom: 16px; }
+
+@media (max-width: 767px) {
+  .about-intro-grid { grid-template-columns: 1fr; }
+  .values-grid { grid-template-columns: 1fr; }
+}
+</style>

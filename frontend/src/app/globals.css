@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/*
+  Design tokens extracted from the live site's compiled CSS
+  (--minimog-color-* custom properties + the elementor-21406 page CSS).
+  Not guesses — verified against the actual production stylesheet.
+*/
+:root {
+  /* Brand */
+  --color-primary: #da3f3f;
+  --color-secondary: #000000;
+
+  /* Page-specific accent colors (home page widgets) */
+  --color-accent-green: #455855;
+  --color-accent-charcoal: #292523;
+  --color-accent-tan: #b17d5c;
+
+  /* Text */
+  --color-text: #666666;
+  --color-text-light: #7e7e7e;
+  --color-text-lighter: #ababab;
+  --color-heading: #000000;
+  --color-link: #000000;
+  --color-link-hover: #999999;
+
+  /* Surfaces */
+  --color-white: #ffffff;
+  --color-box-grey: #f8f8f8;
+  --color-box-light-grey: #f9f9fb;
+  --color-cream: #f4f2eb;
+  --color-cream-dark: #ede9de;
+
+  /* Borders */
+  --color-border: #ededed;
+  --color-border-02: #e9e9e9;
+  --color-border-03: #e6e6e6;
+  --color-border-form: #d2d2d2;
+
+  /* Buttons (grayscale style used site-wide) */
+  --color-button: #606060;
+
+  /* AA-compliant variant of --color-primary for small text on white/cream
+     (the brand red itself is ~4.4:1 on white, just under the 4.5:1 AA
+     threshold for body-sized text — this darker shade clears it while
+     staying in the same hue family; buttons/borders/large text keep using
+     the real brand red). */
+  --color-primary-text: #b93434;
+}
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent-green: var(--color-accent-green);
+  --color-accent-charcoal: var(--color-accent-charcoal);
+  --color-accent-tan: var(--color-accent-tan);
+
+  --color-body: var(--color-text);
+  --color-text-light: var(--color-text-light);
+  --color-text-lighter: var(--color-text-lighter);
+  --color-heading: var(--color-heading);
+  --color-link: var(--color-link);
+  --color-link-hover: var(--color-link-hover);
+
+  --color-box-grey: var(--color-box-grey);
+  --color-box-light-grey: var(--color-box-light-grey);
+  --color-cream: var(--color-cream);
+  --color-cream-dark: var(--color-cream-dark);
+
+  --color-border: var(--color-border);
+  --color-border-02: var(--color-border-02);
+  --color-border-03: var(--color-border-03);
+  --color-border-form: var(--color-border-form);
+
+  --color-button: var(--color-button);
+  --color-primary-text: var(--color-primary-text);
+
+  /* Fonts (verified from --minimog-typography-* + per-widget font-family rules) */
+  --font-body: var(--font-nunito), sans-serif;
+  --font-heading: var(--font-source-sans-3), sans-serif;
+  --font-nav: var(--font-source-serif-4), serif;
+  --font-display: var(--font-italiana), serif;
+  --font-topbar: var(--font-jost), sans-serif;
+}
+
+/*
+  IMPORTANT: base-element styles must live in @layer base, not as bare rules.
+  Tailwind wraps its utilities in @layer utilities; an unlayered rule beats
+  every layered rule regardless of specificity, so a bare `h3 { color }` here
+  was silently overriding every `text-white` / `text-*` class applied to any
+  heading site-wide (this was the cause of "invisible" overlay text on the
+  category cards and hero — not a missing-image bug).
+*/
+@layer base {
+  body {
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    color: var(--color-heading);
+  }
+
+  /* Visible keyboard focus on every interactive element, site-wide, instead
+     of relying on each component to remember to add its own focus ring. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Respect prefers-reduced-motion for all hover/transition animations in one
+   place, rather than adding motion-reduce: variants to every transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
