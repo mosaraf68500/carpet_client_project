@@ -2,8 +2,9 @@ import PageTitleBar from "@/components/common/PageTitleBar";
 import Container from "@/components/common/Container";
 import BlogGrid from "@/components/blog/BlogGrid";
 import BlogPagination from "@/components/blog/BlogPagination";
+import JsonLd from "@/components/common/JsonLd";
 import { blogTitleBar, blogPosts, blogPagination } from "@/data/blogContent";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "Blog | Doha Furniture أثاث الدوحة",
@@ -15,6 +16,7 @@ export const metadata = buildMetadata({
 export default function BlogPage() {
   return (
     <>
+      <JsonLd data={breadcrumbJsonLd(blogTitleBar.breadcrumb)} />
       <PageTitleBar heading={blogTitleBar.heading} breadcrumb={blogTitleBar.breadcrumb} />
       <Container size="boxed" className="py-14">
         <BlogGrid posts={blogPosts} />

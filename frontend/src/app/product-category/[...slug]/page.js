@@ -4,8 +4,10 @@ import PageTitleBar from "@/components/common/PageTitleBar";
 import Container from "@/components/common/Container";
 import FilterSidebar from "@/components/shop/FilterSidebar";
 import ProductGrid from "@/components/shop/ProductGrid";
+import { ShopFiltersProvider } from "@/components/shop/ShopFiltersProvider";
+import JsonLd from "@/components/common/JsonLd";
 import { productCategories, getProductCategory } from "@/data/productCategories";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 // Deviates from the original brief's generic /category/[slug] in favour of
 // the site's real WordPress taxonomy path (/product-category/carpets/modern/,
@@ -20,31 +22,32 @@ export function generateStaticParams() {
   return productCategories.map((c) => ({ slug: c.slug.split("/") }));
 }
 
-export function generateMetadata({ params }) {
-  const category = getProductCategory(params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const category = getProductCategory(slug);
   if (!category) return {};
   return buildMetadata({
     title: `${category.label} | Shop | Doha Furniture أثاث الدوحة`,
     description: `Shop ${category.label} at Doha Furniture أثاث الدوحة — handcrafted carpets, rugs, and textiles.`,
-    path: `/product-category/${params.slug.join("/")}/`,
+    path: `/product-category/${slug.join("/")}/`,
     image: category.image || undefined,
   });
 }
 
-export default function ProductCategoryPage({ params }) {
-  const category = getProductCategory(params.slug);
+export default async function ProductCategoryPage({ params }) {
+  const { slug } = await params;
+  const category = getProductCategory(slug);
   if (!category) notFound();
+  const breadcrumb = [
+    { label: "Home", href: "/" },
+    { label: "Shop", href: "/shop/" },
+    { label: category.label, href: null },
+  ];
 
   return (
     <>
-      <PageTitleBar
-        heading={category.label}
-        breadcrumb={[
-          { label: "Home", href: "/" },
-          { label: "Shop", href: "/shop/" },
-          { label: category.label, href: null },
-        ]}
-      />
+      <JsonLd data={breadcrumbJsonLd(breadcrumb)} />
+      <PageTitleBar heading={category.label} breadcrumb={breadcrumb} />
 
       {category.image && (
         <div className="relative aspect-[21/9] w-full overflow-hidden">
@@ -59,10 +62,12 @@ export default function ProductCategoryPage({ params }) {
         </div>
       )}
 
-      <Container size="wide" className="flex flex-col gap-10 py-12 lg:flex-row">
-        <FilterSidebar />
-        <ProductGrid />
-      </Container>
+      <ShopFiltersProvider>
+        <Container size="wide" className="flex flex-col gap-10 py-12 lg:flex-row">
+          <FilterSidebar />
+          <ProductGrid />
+        </Container>
+      </ShopFiltersProvider>
     </>
   );
 }

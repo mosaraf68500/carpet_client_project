@@ -15,7 +15,7 @@ const socialIcons = {
 export default function Footer() {
   return (
     <footer className="bg-black text-white">
-      <Container size="boxed" className="grid grid-cols-1 gap-10 py-16 md:grid-cols-2 lg:grid-cols-5">
+      <Container size="boxed" className="grid grid-cols-1 gap-10 py-16 md:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-5">
           <Logo light />
           <h6 className="font-heading text-lg text-white">{footer.newsletter.heading}</h6>
@@ -41,20 +41,24 @@ export default function Footer() {
           </p>
         </div>
 
-        {footer.columns.map((col) => (
-          <div key={col.heading} className="flex flex-col gap-3">
-            <h6 className="font-heading text-base text-white">
-              {col.href ? <Link href={col.href}>{col.heading}</Link> : col.heading}
-            </h6>
-            <ul className="flex flex-col gap-2 text-sm text-white/70">
-              {col.links.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="hover:text-white">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        {footer.columnGroups.map((group, i) => (
+          <div key={i} className="flex flex-col gap-8">
+            {group.map((col) => (
+              <div key={col.heading} className="flex flex-col gap-3">
+                <h6 className="font-heading text-base text-white">
+                  {col.href ? <Link href={col.href}>{col.heading}</Link> : col.heading}
+                </h6>
+                <ul className="flex flex-col gap-2 text-sm text-white/70">
+                  {col.links.map((link) => (
+                    <li key={link.href}>
+                      <Link href={link.href} className="hover:text-white">
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         ))}
 
@@ -62,29 +66,25 @@ export default function Footer() {
           <h6 className="font-heading text-base text-white">{footer.needHelp.heading}</h6>
           <ul className="flex flex-col gap-2 text-sm text-white/70">
             <li>
+              <a
+                href={`https://wa.me/${footer.needHelp.whatsapp.number}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-white"
+              >
+                {footer.needHelp.whatsapp.label}: {footer.needHelp.whatsapp.number}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:+${footer.needHelp.phone.number}`} className="hover:text-white">
+                {footer.needHelp.phone.label}: {footer.needHelp.phone.number}
+              </a>
+            </li>
+            <li>
               <a href={`mailto:${footer.needHelp.email}`} className="hover:text-white">
                 {footer.needHelp.email}
               </a>
             </li>
-            <li>
-              <a href={`tel:${footer.needHelp.phone.replace(/\s/g, "")}`} className="hover:text-white">
-                {footer.needHelp.phone}
-              </a>
-            </li>
-            <li>
-              <Link href={footer.needHelp.location.href} className="hover:text-white">
-                {footer.needHelp.location.label}
-              </Link>
-            </li>
-          </ul>
-          <ul className="mt-2 flex flex-col gap-2 text-sm text-white/70">
-            {footer.needHelp.tracking.map((t) => (
-              <li key={t.href}>
-                <a href={t.href} target="_blank" rel="noreferrer" className="hover:text-white">
-                  {t.label}
-                </a>
-              </li>
-            ))}
           </ul>
           <ul className="mt-2 flex gap-4">
             {footer.socials.map((s) => {

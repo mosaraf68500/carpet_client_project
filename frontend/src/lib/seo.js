@@ -1,5 +1,6 @@
 // Central SEO helpers: canonical URL building + JSON-LD schema generators.
-//
+import { footer } from "@/data/siteContent";
+
 // TODO: replace with the real production domain once the client confirms
 // where this deploys — every canonical/OG URL and JSON-LD @id below is
 // built from this one constant.
@@ -36,11 +37,12 @@ export function buildMetadata({ title, description, path = "/", image = "/images
   };
 }
 
-// TODO: the sameAs/contactPoint values below are still the pre-rebrand
-// carpetcellar.com social handles, phone, and email carried over from the
-// live site export. Left in place (real, working links) rather than
-// fabricated Doha Furniture equivalents that wouldn't resolve — swap these
-// for the client's real accounts/contact details once provided.
+// TODO: sameAs below is still the pre-rebrand carpetcellar.com social
+// handles carried over from the live site export. Left in place (real,
+// working links) rather than fabricated Doha Furniture equivalents that
+// wouldn't resolve — swap these for the client's real social accounts once
+// provided. contactPoint now uses the real phone/email from
+// siteContent.footer.needHelp.
 export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
@@ -55,10 +57,25 @@ export function organizationJsonLd() {
     ],
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+91-9811486086",
+      telephone: `+${footer.needHelp.phone.number}`,
       contactType: "customer service",
-      email: "contact@carpetcellar.com",
+      email: footer.needHelp.email,
     },
+  };
+}
+
+export function faqJsonLd(items) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
   };
 }
 

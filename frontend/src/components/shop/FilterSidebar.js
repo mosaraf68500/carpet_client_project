@@ -3,30 +3,26 @@
 import { useUI } from "@/components/layout/UIProvider";
 import CategoryTree from "./CategoryTree";
 import FilterGroup from "./FilterGroup";
-import ColourFilterGroup from "./ColourFilterGroup";
-import {
-  categoryFilterTree,
-  sizeFtFilter,
-  sizeCmFilter,
-  colourFilter,
-  materialFilter,
-  shapeFilter,
-  priceRangeFilter,
-} from "@/data/shopContent";
+import { useShopFilters } from "./ShopFiltersProvider";
+import { categoryFilterTree, sizeFtFilter, sizeCmFilter } from "@/data/shopContent";
 
 function FilterContent() {
+  const { sizeFt, sizeCm, toggleSizeFt, toggleSizeCm } = useShopFilters();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="border-b border-border pb-6">
         <h4 className="mb-4 font-heading text-base">Category</h4>
         <CategoryTree tree={categoryFilterTree} />
       </div>
-      <FilterGroup title="Size in feet" items={sizeFtFilter} />
-      <FilterGroup title="Size in cm" items={sizeCmFilter} defaultOpen={false} />
-      <ColourFilterGroup title="Colour" items={colourFilter} />
-      <FilterGroup title="Material" items={materialFilter} defaultOpen={false} />
-      <FilterGroup title="Shape" items={shapeFilter} defaultOpen={false} />
-      <FilterGroup title="Price" items={priceRangeFilter} />
+      <FilterGroup title="Size in feet" items={sizeFtFilter} checkedSet={sizeFt} onToggle={toggleSizeFt} />
+      <FilterGroup
+        title="Size in cm"
+        items={sizeCmFilter}
+        checkedSet={sizeCm}
+        onToggle={toggleSizeCm}
+        defaultOpen={false}
+      />
     </div>
   );
 }

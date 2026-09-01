@@ -4,7 +4,6 @@ import BestsellingCollections from "@/components/home/BestsellingCollections";
 import ProductSpotlight from "@/components/home/ProductSpotlight";
 import PromoBanner from "@/components/home/PromoBanner";
 import BlogSection from "@/components/home/BlogSection";
-import AboutSection from "@/components/home/AboutSection";
 import PressLogos from "@/components/home/PressLogos";
 import { buildMetadata } from "@/lib/seo";
 
@@ -37,8 +36,6 @@ export default function Home() {
       <PromoBanner />
       <BlogSection />
       <InstagramFeed />
-      <AboutSection />
       <PressLogos />
     </>
-  );
-}
+  ); }

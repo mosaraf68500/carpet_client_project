@@ -4,15 +4,7 @@ import { createContext, useContext, useState, useCallback } from "react";
 
 const UIContext = createContext(null);
 
-const PANELS = [
-  "mobileMenu",
-  "search",
-  "cart",
-  "login",
-  "register",
-  "lostPassword",
-  "shopFilters",
-];
+const PANELS = ["mobileMenu", "cart", "shopFilters"];
 
 export function UIProvider({ children }) {
   const [open, setOpen] = useState({});

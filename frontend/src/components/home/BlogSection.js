@@ -23,7 +23,7 @@ export default function BlogSection() {
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
-            <span className="text-xs uppercase tracking-wide text-primary-text">{post.category}</span>
+            <span className="text-xs uppercase tracking-wide text-button">{post.category}</span>
             <h3 className="font-heading text-lg group-hover:text-primary">{post.title}</h3>
           </Link>
         ))}

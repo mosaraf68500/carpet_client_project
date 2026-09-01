@@ -71,51 +71,27 @@ export const sizeCmFilter = [
   { label: "550 cm x 365 cm & higher", count: 207 },
 ];
 
-export const colourFilter = [
-  { label: "Violet", count: 61 },
-  { label: "Yellow", count: 108 },
-  { label: "Orange", count: 137 },
-  { label: "Red", count: 358 },
-  { label: "Pink", count: 226 },
-  { label: "Blue", count: 523 },
-  { label: "Green", count: 108 },
-  { label: "Brown", count: 561 },
-  { label: "Beige, Off White", count: 1093 },
-  { label: "Silver, Grey", count: 536 },
-  { label: "White", count: 19 },
-  { label: "Black", count: 87 },
-  { label: "Multi", count: 204 },
-];
+// The 10 labels in sizeFtFilter and sizeCmFilter above are the same size
+// tiers expressed in two units (e.g. "6 ft x 4 ft" is "180 cm x 120 cm") —
+// same order, same count, each pair converts to within a few cm/inches of
+// the other. That means a product's tier can be computed once from its
+// (feet) `size` string and used to match a checked box in either list.
+//
+// Mock products only carry a free-text `size` string like "6.3 x 2.9" (no
+// unit label), not a pre-assigned size-tier — real rug dimensions in this
+// range are always feet, and the numbers line up with the ft tier labels
+// below, so the larger of the two dimensions is treated as feet and binned
+// into the smallest tier whose ft threshold it fits under (the last tier
+// catches anything above the second-to-last threshold, matching "& higher").
+const sizeFtThresholds = sizeFtFilter.map((tier) => parseFloat(tier.label));
 
-export const materialFilter = [
-  { label: "Wool", count: null },
-  { label: "Silk and Wool", count: null },
-  { label: "Silk", count: null },
-  { label: "Bamboo Silk", count: null },
-  { label: "Saree Silk", count: null },
-  { label: "Cotton", count: null },
-  { label: "Jute", count: null },
-  { label: "Sisal", count: null },
-  { label: "Cotton and Silk", count: null },
-  { label: "Pashmina", count: null },
-  { label: "Pashmina and Silk", count: null },
-  { label: "Shahmina", count: null },
-];
-
-export const shapeFilter = [
-  { label: "Irregular", count: null },
-  { label: "Rectangle", count: null },
-  { label: "Round", count: null },
-  { label: "Runner", count: null },
-  { label: "Square", count: null },
-];
-
-export const priceRangeFilter = [
-  { label: "₹ 0 - ₹ 50,000", min: 0, max: 50000 },
-  { label: "₹ 50,000 - ₹ 150,000", min: 50000, max: 150000 },
-  { label: "₹ 150,000 - ₹ 250,000", min: 150000, max: 250000 },
-  { label: "₹ 250,000 & above", min: 250000, max: null },
-];
+export function getSizeTierIndex(sizeString) {
+  const numbers = sizeString?.match(/[\d.]+/g);
+  if (!numbers || numbers.length === 0) return null;
+  const maxDimensionFt = Math.max(...numbers.map(Number));
+  const index = sizeFtThresholds.findIndex((threshold) => maxDimensionFt <= threshold);
+  return index === -1 ? sizeFtThresholds.length - 1 : index;
+}
 
 export const sortOptions = [
   { value: "menu_order", label: "Default sorting" },

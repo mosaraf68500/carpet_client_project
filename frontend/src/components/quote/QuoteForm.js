@@ -1,7 +1,7 @@
 "use client";
 
 // No real backend to submit to yet — mirrors the pattern already used by
-// CartDrawer/AuthModals (preserve the real UI/validation, fake the submit).
+// CartDrawer (preserve the real UI/validation, fake the submit).
 // TODO: wire up to the real quote-request endpoint once one exists.
 import { useState } from "react";
 import { quoteForm } from "@/data/quoteContent";

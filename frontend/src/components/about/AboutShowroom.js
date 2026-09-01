@@ -3,8 +3,8 @@ import Button from "@/components/common/Button";
 import { aboutShowroom } from "@/data/aboutContent";
 
 // TODO: replace with real design once client provides it — intro copy is
-// placeholder filler; location/phone/email are the real values already
-// defined in data/siteContent.js (footer.needHelp), reused rather than invented.
+// placeholder filler; phone/email are the real values already defined in
+// data/siteContent.js (footer.needHelp), reused rather than invented.
 export default function AboutShowroom() {
   return (
     <Container as="section" size="boxed" className="py-16 text-center">
@@ -12,13 +12,9 @@ export default function AboutShowroom() {
       <p className="mx-auto mt-4 max-w-xl text-body">{aboutShowroom.text}</p>
       <dl className="mt-6 flex flex-col items-center gap-1 text-sm text-body">
         <div className="flex gap-2">
-          <dt className="font-medium">Showrooms:</dt>
-          <dd>{aboutShowroom.location}</dd>
-        </div>
-        <div className="flex gap-2">
           <dt className="font-medium">Phone:</dt>
           <dd>
-            <a href={`tel:${aboutShowroom.phone.replace(/\s/g, "")}`} className="hover:text-primary">
+            <a href={`tel:+${aboutShowroom.phone}`} className="hover:text-primary">
               {aboutShowroom.phone}
             </a>
           </dd>

@@ -11,8 +11,6 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MobileMenu from "@/components/layout/MobileMenu";
 import CartDrawer from "@/components/layout/CartDrawer";
-import SearchModal from "@/components/layout/SearchModal";
-import AuthModals from "@/components/layout/AuthModals";
 import JsonLd from "@/components/common/JsonLd";
 import { SITE_URL, organizationJsonLd } from "@/lib/seo";
 
@@ -62,7 +60,7 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${nunito.variable} ${sourceSans3.variable} ${sourceSerif4.variable} ${italiana.variable} ${jost.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-body font-body pb-16 lg:pb-0">
+      <body className="min-h-full flex flex-col bg-white text-body font-body">
         <JsonLd data={organizationJsonLd()} />
         <UIProvider>
           <Navbar />
@@ -70,8 +68,6 @@ export default function RootLayout({ children }) {
           <Footer />
           <MobileMenu />
           <CartDrawer />
-          <SearchModal />
-          <AuthModals />
         </UIProvider>
       </body>
     </html>

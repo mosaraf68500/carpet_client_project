@@ -6,14 +6,15 @@ import ProductInfo from "@/components/product/ProductInfo";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import JsonLd from "@/components/common/JsonLd";
 import { allProducts, getProductBySlug, getRelatedProducts } from "@/data/productCatalog";
-import { buildMetadata, productJsonLd } from "@/lib/seo";
+import { buildMetadata, productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 export function generateStaticParams() {
   return allProducts.map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }) {
-  const product = getProductBySlug(params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
   if (!product) return {};
   return buildMetadata({
     title: `${product.title} | Doha Furniture أثاث الدوحة`,
@@ -25,23 +26,23 @@ export function generateMetadata({ params }) {
   });
 }
 
-export default function ProductPage({ params }) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
   if (!product) notFound();
 
   const related = getRelatedProducts(product.slug);
+  const breadcrumb = [
+    { label: "Home", href: "/" },
+    { label: "Shop", href: "/shop/" },
+    { label: product.title, href: null },
+  ];
 
   return (
     <>
       <JsonLd data={productJsonLd(product)} />
-      <PageTitleBar
-        heading={product.title}
-        breadcrumb={[
-          { label: "Home", href: "/" },
-          { label: "Shop", href: "/shop/" },
-          { label: product.title, href: null },
-        ]}
-      />
+      <JsonLd data={breadcrumbJsonLd(breadcrumb)} />
+      <PageTitleBar heading={product.title} breadcrumb={breadcrumb} />
       <Container size="boxed" className="py-14">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <ProductGallery images={[product.image, product.hoverImage]} title={product.title} />

@@ -18,10 +18,11 @@ export const nav = {
     { label: "About", href: "/about/" },
     { label: "Blog", href: "/blog/" },
   ],
-  // The "Shop" mega menu content below exists in the original markup but is hidden
-  // site-wide via a `.old-menu{display:none}` rule in the source CSS, so on the live
-  // site hovering "Shop" shows no dropdown. Kept here (unrendered) for later use —
-  // flagged for you in the summary.
+  // The "Shop" mega menu content below exists in the original markup but was hidden
+  // site-wide on the live site via a `.old-menu{display:none}` rule in the source CSS.
+  // Rendered here as a real hover-dropdown (ShopDropdown) per product decision — these
+  // are also the single source of truth for the /product-category/ routes generated in
+  // data/productCategories.js, so the dropdown and the routes never drift apart.
   megaMenu: {
     columns: [
       {
@@ -86,18 +87,10 @@ export const nav = {
       ],
     },
   },
-  mobileTabs: [
-    { label: "Home", href: "/", icon: "home" },
-    { label: "Shop", href: "/shop/", icon: "shop" },
-    { label: "Wishlist", href: "/wishlist/", icon: "wishlist" },
-    { label: "Cart", href: "/cart/", icon: "cart" },
-    { label: "Search", href: "#", icon: "search" },
-  ],
 };
 
-export const currencySwitcher = {
-  current: "INR",
-  options: ["INR", "USD"],
+export const searchField = {
+  placeholder: "Search products...",
 };
 
 export const heroSlides = [
@@ -148,12 +141,42 @@ export const bestsellingCollections = {
   heading: "Our bestselling collections",
   subheading: "World's finest curated treasures",
   categories: [
-    { name: "Modern Rugs", image: "/images/Modern.jpg", href: "/product-category/carpets/modern" },
-    { name: "Transitional Rugs", image: "/images/Bestselling_Transitional-1.jpg", href: "/product-category/carpets/transitional/" },
-    { name: "Timeless Classics", image: "/images/Timeless-Classics.jpg", href: "/product-category/carpets/timeless-classics/" },
-    { name: "Antique Persians", image: "/images/Antique-Persian.jpg", href: "/product-category/carpets/antique-persians" },
-    { name: "Kilims", image: "/images/Kilims.jpg", href: "/product-category/kilims/" },
-    { name: "Vintage Collectibles", image: "/images/Bestselling_Vintage-Collectibles-1.jpg", href: "/product-category/carpets/vintage-collectibles" },
+    {
+      name: "Modern Rugs",
+      image: "/images/Modern.jpg",
+      href: "/product-category/carpets/modern",
+      description: "Browse newly created designs inspired by art, architecture and more.",
+    },
+    {
+      name: "Transitional Rugs",
+      image: "/images/Bestselling_Transitional-1.jpg",
+      href: "/product-category/carpets/transitional/",
+      description: "Hunt for treasures amidst these transitional designs and sophisticated colour palettes.",
+    },
+    {
+      name: "Timeless Classics",
+      image: "/images/Timeless-Classics.jpg",
+      href: "/product-category/carpets/timeless-classics/",
+      description: "Our range of skillful reproductions of cherished antiques from Persia, Middle East, and more.",
+    },
+    {
+      name: "Antique Persians",
+      image: "/images/Antique-Persian.jpg",
+      href: "/product-category/carpets/antique-persians",
+      description: "Invest in a family heirloom and take home a genuine antique carpet to suit any home.",
+    },
+    {
+      name: "Kilims",
+      image: "/images/Kilims.jpg",
+      href: "/product-category/kilims/",
+      description: "Discover antique Kilims from Persia and Central Asia and their exquisite reproductions.",
+    },
+    {
+      name: "Vintage Collectibles",
+      image: "/images/Bestselling_Vintage-Collectibles-1.jpg",
+      href: "/product-category/carpets/vintage-collectibles",
+      description: "Make a statement with striking Kilim and Vintage Collectibles from nomadic cultures.",
+    },
     { name: "Ornamental Florals", image: "/images/Ornamental-Florals-1.jpg", href: "/product-tag/Floral-Rugs/", featured: true },
     { name: "Geometric Vintage Treasures", image: "/images/Geometric-Vintage-Treasures-1.jpg", href: "/product-tag/Geometric-Rugs/", featured: true },
   ],
@@ -247,9 +270,11 @@ export const productSpotlight = {
 
 export const promoBanner = {
   heading: "Timeless tradition meets contemporary artistry!",
+  description:
+    "Drawing inspiration from the intricate patterns of antique hand-knotted carpets, our new revival collections breathe life into centuries-old designs. Each piece pays homage to its historical roots while being thoughtfully reimagined for modern interiors, preserving the legacy of craftsmanship through meticulous detail, natural dyes, and heritage weaving techniques.",
+  cta: { label: "Know more", href: "/should-i-opt-for-a-new-or-antique-rug" },
   videoUrl:
     "https://www.youtube.com/embed/69L6iq9hq3w?autoplay=1&mute=1&loop=1&playlist=69L6iq9hq3w",
-  href: "/should-i-opt-for-a-new-or-antique-rug",
 };
 
 export const trustBadges = [
@@ -380,10 +405,10 @@ export const aboutSection = {
 };
 
 export const partnerLogos = [
-  { src: "/images/1.png", alt: "Partner logo 1" },
-  { src: "/images/2.png", alt: "Partner logo 2" },
-  { src: "/images/3.png", alt: "Partner logo 3" },
-  { src: "/images/4.png", alt: "Partner logo 4" },
+  { src: "/images/1.png", alt: "Elle Decor" },
+  { src: "/images/2.png", alt: "Architectural Digest" },
+  { src: "/images/3.png", alt: "Vogue" },
+  { src: "/images/4.png", alt: "India Today Home" },
 ];
 
 export const footer = {
@@ -394,56 +419,30 @@ export const footer = {
   },
   contactText: "Got questions? Contact Us",
   contactHref: "/contact/",
-  columns: [
-    {
-      heading: "Carpets",
-      links: [
-        { label: "Transitional", href: "/product-category/carpets/transitional/" },
-        { label: "Modern", href: "/product-category/carpets/modern/" },
-        { label: "Timeless Classics", href: "/product-category/carpets/timeless-classics/" },
-        { label: "Antique Persians", href: "/product-category/carpets/antique-persians/" },
-        { label: "Vintage Collectibles", href: "/product-category/carpets/vintage-collectibles/" },
-      ],
-    },
-    {
-      heading: "Kilims",
-      links: [
-        { label: "Vintage Kilims", href: "/product-category/kilims/vintage-kilims/" },
-        { label: "New Flatweave Rugs", href: "/product-category/kilims/new-flatweave-rugs/" },
-      ],
-    },
-    {
-      heading: "Services",
-      links: [
-        { label: "Design Quiz", href: "/quiz/" },
-        { label: "Customize your Rug", href: "/customize-your-rug/" },
-        { label: "Book An Appointment", href: "/book-an-appointment/" },
-        { label: "FAQs", href: "/faqs/" },
-      ],
-    },
-    {
-      heading: "Press & Media",
-      href: "/media/",
-      links: [],
-    },
-    {
-      heading: "For More",
-      links: [
-        { label: "Terms & Conditions", href: "/terms-conditions/" },
-        { label: "Shipping & Delivery Policy", href: "/shipping-delivery-policy/" },
-        { label: "Privacy Policy", href: "/privacy-policy/" },
-      ],
-    },
+  // Grouped into columns the way the footer actually renders them — each
+  // inner array is one grid column, stacking multiple heading+link blocks
+  // where the design calls for it (Services + Press & Media share a column).
+  // Carpets/Services links are pulled from nav.megaMenu (the same source the
+  // Shop dropdown uses) instead of a second hardcoded copy, so they can't drift.
+  columnGroups: [
+    [nav.megaMenu.columns.find((c) => c.heading === "Carpets")],
+    [
+      { heading: "Services", links: nav.megaMenu.services.links },
+      {
+        heading: "Press & Media",
+        href: "/media/",
+        links: [
+          { label: "Terms & Conditions", href: "/terms-conditions/" },
+          { label: "Privacy Policy", href: "/privacy-policy/" },
+        ],
+      },
+    ],
   ],
   needHelp: {
     heading: "Need Help?",
-    email: "contact@carpetcellar.com",
-    phone: "+91 9811486086",
-    location: { label: "New Delhi | Doha", href: "/our-showrooms/" },
-    tracking: [
-      { label: "Track your order (within India)", href: "https://carpetcellar.shiprocket.co/tracking" },
-      { label: "Track your order (outside India)", href: "https://www.fedex.com/en-us/tracking.html" },
-    ],
+    whatsapp: { label: "WhatsApp", number: "97477556386" },
+    phone: { label: "Phone", number: "97477556386" },
+    email: "Carpetunique588@Gmail.com",
   },
   socials: [
     { label: "Facebook", href: "https://www.facebook.com/thecarpetcellar", icon: "facebook" },
@@ -453,50 +452,6 @@ export const footer = {
   ],
   // Distinct legal entity name shown in the source — left unchanged, it is not the brand name.
   copyright: "Woolsheel Traders Pvt. Ltd",
-};
-
-export const searchModal = {
-  heading: "Search our store",
-  placeholder: "Search products",
-  popularSearchesLabel: "Popular Searches:",
-  popularSearches: [{ label: "T-Shirt", href: "/search/T-Shirt/" }],
-  viewAllLabel: "View all search results",
-};
-
-export const authModals = {
-  login: {
-    title: "Sign In",
-    usernameLabel: "Username or email",
-    usernamePlaceholder: "Your username or email",
-    passwordLabel: "Password",
-    passwordPlaceholder: "Password",
-    rememberLabel: "Stay signed in",
-    forgotLabel: "Forgot your password?",
-    submitLabel: "Log In",
-    switchText: "Don't have an account yet?",
-    switchCta: "Sign up",
-  },
-  register: {
-    title: "Sign Up",
-    firstNameLabel: "First name",
-    lastNameLabel: "Last name",
-    emailLabel: "Email",
-    emailHelp: "A link to set a new password will be sent to your email address.",
-    acceptLabel: "Yes, I agree with Privacy Policy and Terms of Use",
-    submitLabel: "Sign Up",
-    switchText: "Already have an account?",
-    switchCta: "Log in",
-  },
-  lostPassword: {
-    title: "Lost your password?",
-    description:
-      "Please enter your username or email address. You will receive a link to create a new password via email.",
-    usernameLabel: "Username or email",
-    usernamePlaceholder: "Your username or email",
-    submitLabel: "Reset password",
-    switchText: "Remember now?",
-    switchCta: "Back to login",
-  },
 };
 
 export const cartDrawer = {

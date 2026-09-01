@@ -45,13 +45,12 @@ export const aboutValues = {
   ],
 };
 
-// TODO: placeholder filler — showroom copy is invented; location/phone/email
-// reuse the real values already defined in siteContent.footer.needHelp.
+// TODO: placeholder filler — showroom copy is invented; phone/email reuse
+// the real values already defined in siteContent.footer.needHelp.
 export const aboutShowroom = {
   heading: "Visit our showroom",
   text: "Come see and feel the collection in person. Our specialists are on hand to help you find the right piece, or to talk through a custom order.",
-  location: footer.needHelp.location.label,
-  phone: footer.needHelp.phone,
+  phone: footer.needHelp.phone.number,
   email: footer.needHelp.email,
   cta: { label: "Request a Quote", href: "/quote/" },
 };

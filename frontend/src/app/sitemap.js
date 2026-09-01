@@ -6,7 +6,18 @@ import { blogPosts } from "@/data/blogContent";
 export default function sitemap() {
   const now = new Date();
 
-  const staticRoutes = ["/", "/shop/", "/blog/", "/about/", "/quote/"].map((path) => ({
+  const staticRoutes = [
+    "/",
+    "/shop/",
+    "/blog/",
+    "/about/",
+    "/quote/",
+    "/contact/",
+    "/faqs/",
+    "/book-an-appointment/",
+    "/terms-conditions/",
+    "/privacy-policy/",
+  ].map((path) => ({
     url: new URL(path, SITE_URL).toString(),
     lastModified: now,
     changeFrequency: path === "/" ? "daily" : "weekly",

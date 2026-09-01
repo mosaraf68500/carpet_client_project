@@ -2,18 +2,11 @@
 
 import { useState } from "react";
 
-// Generic collapsible checkbox-list filter (Size in feet, Size in cm, Material, Shape).
-export default function FilterGroup({ title, items, defaultOpen = true }) {
+// Generic collapsible checkbox-list filter (Size in feet, Size in cm).
+// Controlled: `checked` and `onToggle` come from the parent (ShopFiltersProvider)
+// so the selection can also drive ProductGrid's filtering, not just this UI.
+export default function FilterGroup({ title, items, checkedSet, onToggle, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
-  const [checkedSet, setCheckedSet] = useState(() => new Set());
-
-  const toggle = (label) => {
-    setCheckedSet((prev) => {
-      const next = new Set(prev);
-      next.has(label) ? next.delete(label) : next.add(label);
-      return next;
-    });
-  };
 
   return (
     <div className="border-b border-border pb-6">
@@ -34,7 +27,7 @@ export default function FilterGroup({ title, items, defaultOpen = true }) {
                   <input
                     type="checkbox"
                     checked={checkedSet.has(item.label)}
-                    onChange={() => toggle(item.label)}
+                    onChange={() => onToggle(item.label)}
                     className="h-4 w-4 accent-black"
                   />
                   {item.label}

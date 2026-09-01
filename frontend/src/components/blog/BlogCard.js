@@ -19,7 +19,7 @@ export default function BlogCard({ post }) {
       <div className="mt-4">
         <Link
           href={post.categoryHref}
-          className="text-xs font-medium uppercase tracking-wide text-primary-text hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="text-xs font-medium uppercase tracking-wide text-button hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           {post.category}
         </Link>

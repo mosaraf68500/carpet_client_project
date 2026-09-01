@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import PageTitleBar from "@/components/common/PageTitleBar";
 import Container from "@/components/common/Container";
 import BlogGrid from "@/components/blog/BlogGrid";
+import JsonLd from "@/components/common/JsonLd";
 import { blogPosts } from "@/data/blogContent";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 // Blog post category archive — matches the real categoryHref values already
 // extracted onto every post in data/blogContent.js (e.g. "/category/all-posts/").
@@ -23,32 +24,33 @@ export function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-export function generateMetadata({ params }) {
-  const category = getCategory(params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const category = getCategory(slug);
   if (!category) return {};
   return buildMetadata({
     title: `${category} | Doha Furniture أثاث الدوحة Blog`,
     description: `Posts filed under ${category} on the Doha Furniture أثاث الدوحة blog.`,
-    path: `/category/${params.slug}/`,
+    path: `/category/${slug}/`,
   });
 }
 
-export default function BlogCategoryPage({ params }) {
-  const category = getCategory(params.slug);
+export default async function BlogCategoryPage({ params }) {
+  const { slug } = await params;
+  const category = getCategory(slug);
   if (!category) notFound();
 
   const posts = blogPosts.filter((p) => p.category === category);
+  const breadcrumb = [
+    { label: "Home", href: "/" },
+    { label: "Blog", href: "/blog/" },
+    { label: category, href: null },
+  ];
 
   return (
     <>
-      <PageTitleBar
-        heading={category}
-        breadcrumb={[
-          { label: "Home", href: "/" },
-          { label: "Blog", href: "/blog/" },
-          { label: category, href: null },
-        ]}
-      />
+      <JsonLd data={breadcrumbJsonLd(breadcrumb)} />
+      <PageTitleBar heading={category} breadcrumb={breadcrumb} />
       <Container size="boxed" className="py-14">
         <BlogGrid posts={posts} />
       </Container>

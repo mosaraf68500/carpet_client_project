@@ -11,13 +11,14 @@ export default function CategoryGrid({ categories, columns = 4 }) {
       : "sm:grid-cols-2";
 
   return (
-    <div className={`grid grid-cols-2 gap-3 ${colsClass}`}>
+    <div className={`grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 ${colsClass}`}>
       {categories.map((cat) => (
         <CategoryCard
           key={cat.name}
           name={cat.name}
           image={cat.image}
           href={cat.href}
+          description={cat.description}
           featured={cat.featured}
         />
       ))}

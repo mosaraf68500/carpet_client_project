@@ -65,9 +65,6 @@ export default function ProductCard({ product, onAddToCart, align = "center" }) 
           {product.title}
         </Link>
         {product.size && <span className="text-xs text-text-light">{product.size}</span>}
-        <span className="text-sm font-medium text-body">
-          {product.priceOnRequest ? "Price available on request" : product.price}
-        </span>
         {product.description && (
           <p className="line-clamp-2 text-xs text-text-light">{product.description}</p>
         )}
