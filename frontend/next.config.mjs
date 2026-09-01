@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // No component currently references an external image URL — every asset was
-  // downloaded into /public. This stays as a safety net in case a future page
-  // hotlinks something from the original site before it's been copied locally.
+  // Every real asset was downloaded into /public. images.unsplash.com is the
+  // one exception, used for stock photography where no real photo exists yet
+  // (blog placeholder posts in data/blogContent.js; several rows on the
+  // /services/* pages in data/servicesContent.js) — swap in real assets as
+  // they're provided and this entry can shrink accordingly.
   images: {
     remotePatterns: [
       {
@@ -12,6 +14,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "carpetcellar.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },

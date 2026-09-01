@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { footer } from "@/data/siteContent";
-import { FacebookIcon, TwitterIcon, InstagramIcon } from "@/components/common/Icons";
+import { FacebookIcon, TwitterIcon, InstagramIcon, TikTokIcon } from "@/components/common/Icons";
 import Logo from "@/components/common/Logo";
 import Container from "@/components/common/Container";
 
@@ -10,6 +10,7 @@ const socialIcons = {
   facebook: FacebookIcon,
   twitter: TwitterIcon,
   instagram: InstagramIcon,
+  tiktok: TikTokIcon,
 };
 
 export default function Footer() {

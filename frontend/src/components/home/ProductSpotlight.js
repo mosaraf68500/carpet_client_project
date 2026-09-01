@@ -11,7 +11,15 @@ export default function ProductSpotlight() {
 
       <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
         {productSpotlight.products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+          <ProductCard
+            key={product.slug}
+            product={product}
+            align="left"
+            showActions={false}
+            showOverlayCta
+            showBottomCta={false}
+            hoverEffect="zoom"
+          />
         ))}
       </div>
     </Container>

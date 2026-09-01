@@ -113,6 +113,23 @@
   }
 }
 
+/* Sonar-style ripple: a ring expands outward from the icon and fades, like
+   waves radiating from the floating contact buttons. */
+@keyframes ripple-wave {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-ripple-wave {
+  animation: ripple-wave 2s ease-out infinite;
+}
+
 /* Respect prefers-reduced-motion for all hover/transition animations in one
    place, rather than adding motion-reduce: variants to every transition. */
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/*
+  Color tokens copied from frontend/src/app/globals.css so the admin's
+  brand color matches the public site exactly. Keep these two files in
+  sync if the brand palette changes.
+*/
+:root {
+  /* Brand */
+  --color-primary: #da3f3f;
+  --color-secondary: #000000;
+
+  /* Page-specific accent colors (home page widgets) */
+  --color-accent-green: #455855;
+  --color-accent-charcoal: #292523;
+  --color-accent-tan: #b17d5c;
+
+  /* Text */
+  --color-text: #666666;
+  --color-text-light: #7e7e7e;
+  --color-text-lighter: #ababab;
+  --color-heading: #000000;
+  --color-link: #000000;
+  --color-link-hover: #999999;
+
+  /* Surfaces */
+  --color-white: #ffffff;
+  --color-box-grey: #f8f8f8;
+  --color-box-light-grey: #f9f9fb;
+  --color-cream: #f4f2eb;
+  --color-cream-dark: #ede9de;
+
+  /* Borders */
+  --color-border: #ededed;
+  --color-border-02: #e9e9e9;
+  --color-border-03: #e6e6e6;
+  --color-border-form: #d2d2d2;
+
+  /* Buttons (grayscale style used site-wide) */
+  --color-button: #606060;
+
+  /* AA-compliant variant of --color-primary for small text on white/cream
+     (the brand red itself is ~4.4:1 on white, just under the 4.5:1 AA
+     threshold for body-sized text — this darker shade clears it while
+     staying in the same hue family; buttons/borders/large text keep using
+     the real brand red). */
+  --color-primary-text: #b93434;
+
+  /* Admin shell (this project's first dark token — frontend/globals.css
+     has no dark surface to reuse, so this is introduced here). */
+  --color-sidebar: #171717;
+}
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent-green: var(--color-accent-green);
+  --color-accent-charcoal: var(--color-accent-charcoal);
+  --color-accent-tan: var(--color-accent-tan);
+
+  --color-body: var(--color-text);
+  --color-text-light: var(--color-text-light);
+  --color-text-lighter: var(--color-text-lighter);
+  --color-heading: var(--color-heading);
+  --color-link: var(--color-link);
+  --color-link-hover: var(--color-link-hover);
+
+  --color-box-grey: var(--color-box-grey);
+  --color-box-light-grey: var(--color-box-light-grey);
+  --color-cream: var(--color-cream);
+  --color-cream-dark: var(--color-cream-dark);
+
+  --color-border: var(--color-border);
+  --color-border-02: var(--color-border-02);
+  --color-border-03: var(--color-border-03);
+  --color-border-form: var(--color-border-form);
+
+  --color-button: var(--color-button);
+  --color-primary-text: var(--color-primary-text);
+
+  --color-sidebar: var(--color-sidebar);
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-heading);
+  }
+
+  /* Visible keyboard focus on every interactive element, site-wide, instead
+     of relying on each component to remember to add its own focus ring. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

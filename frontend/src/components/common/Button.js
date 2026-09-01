@@ -5,6 +5,7 @@ const styles = {
   border: "bg-transparent text-white border border-white hover:bg-white hover:text-black",
   "bottom-line": "bg-transparent text-black border-b border-black",
   dark: "bg-black text-white border border-black hover:bg-white hover:text-black",
+  "outline-dark": "bg-transparent text-black border border-black hover:bg-black hover:text-white",
 };
 
 export default function Button({

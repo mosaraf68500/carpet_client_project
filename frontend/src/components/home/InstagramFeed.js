@@ -36,7 +36,13 @@ export default function InstagramFeed() {
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {instagramFeed.posts.map((post, i) => (
-            <div key={i} className="group relative aspect-square overflow-hidden bg-white">
+            <a
+              key={i}
+              href={instagramFeed.profile.followHref}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative aspect-square overflow-hidden bg-white"
+            >
               <Image
                 src={post.image}
                 alt={post.caption}
@@ -47,7 +53,7 @@ export default function InstagramFeed() {
               <div className="absolute inset-0 hidden items-center justify-center bg-black/60 p-4 text-center text-xs text-white group-hover:flex">
                 {post.caption}
               </div>
-            </div>
+            </a>
           ))}
         </div>
 

@@ -37,11 +37,10 @@ export function buildMetadata({ title, description, path = "/", image = "/images
   };
 }
 
-// TODO: sameAs below is still the pre-rebrand carpetcellar.com social
-// handles carried over from the live site export. Left in place (real,
-// working links) rather than fabricated Doha Furniture equivalents that
-// wouldn't resolve — swap these for the client's real social accounts once
-// provided. contactPoint now uses the real phone/email from
+// sameAs below is the client's real social accounts (Facebook, Instagram,
+// TikTok provided directly; Twitter is still the pre-rebrand carpetcellar.com
+// handle carried over from the live site export, kept since no replacement
+// has been provided for it). contactPoint uses the real phone/email from
 // siteContent.footer.needHelp.
 export function organizationJsonLd() {
   return {
@@ -51,9 +50,10 @@ export function organizationJsonLd() {
     url: SITE_URL,
     logo: absoluteUrl("/images/Layer-1-720x56.png"),
     sameAs: [
-      "https://www.facebook.com/thecarpetcellar",
+      "https://www.facebook.com/profile.php?id=61582328190916",
       "https://twitter.com/TheCarpetCellar",
-      "https://www.instagram.com/thecarpetcellar/",
+      "https://www.instagram.com/unique_carpet_doha",
+      "https://www.tiktok.com/@unique.carpet",
     ],
     contactPoint: {
       "@type": "ContactPoint",

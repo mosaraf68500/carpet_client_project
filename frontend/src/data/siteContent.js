@@ -68,15 +68,16 @@ export const nav = {
       },
       { heading: "Clearance", href: "/product-category/clearance", links: [] },
     ],
+    // The 3 real services this business offers — replaces the earlier
+    // 6-item placeholder (Choose your rug / Herbal Washing / Rug
+    // Restoration / Customize your Rug / Book An Appointment / FAQs),
+    // which was invented from a screenshot, not real.
     services: {
       heading: "Services",
       links: [
-        { label: "Choose your rug", href: "/choose-your-rug/" },
-        { label: "Herbal Washing", href: "/herbal-washing/" },
-        { label: "Rug Restoration", href: "/restoration/" },
-        { label: "Customize your Rug", href: "/customize-your-rug/" },
-        { label: "Book An Appointment", href: "/book-an-appointment/" },
-        { label: "FAQs", href: "/faqs/" },
+        { label: "Installation", href: "/services/installation/" },
+        { label: "Fixing", href: "/services/fixing/" },
+        { label: "Delivery", href: "/services/delivery/" },
       ],
     },
     about: {
@@ -311,15 +312,17 @@ export const blogSection = {
 
 export const instagramFeed = {
   heading: "Follow our journey",
+  // Was the old pre-rebrand "@carpetcellar | @thecarpetcellar" handle list —
+  // replaced with the site name per the client's correction, still linking
+  // to the real Instagram profile below.
   handles: [
-    { label: "@carpetcellar", href: "https://www.instagram.com/carpetcellar/" },
-    { label: "@thecarpetcellar", href: "https://www.instagram.com/thecarpetcellar/" },
+    { label: "Doha Furniture أثاث الدوحة", href: "https://www.instagram.com/unique_carpet_doha?utm_source=qr" },
   ],
   profile: {
-    username: "thecarpetcellar",
+    username: "unique_carpet_doha",
     avatar: "/images/thecarpetcellar.webp",
-    bio: "Fine handwoven & hand knotted carpets rugs wall hangings vintage textiles from India, Persia & beyond @carpetcellar",
-    followHref: "https://www.instagram.com/thecarpetcellar/",
+    bio: "Fine handwoven & hand knotted carpets rugs wall hangings vintage textiles from India, Persia & beyond @unique_carpet_doha",
+    followHref: "https://www.instagram.com/unique_carpet_doha?utm_source=qr",
   },
   // The live export lazy-loads these from Instagram's own CDN via JS; the raw HTML only
   // contains the plugin's placeholder image, so no real post photos were available to copy.
@@ -445,10 +448,14 @@ export const footer = {
     email: "Carpetunique588@Gmail.com",
   },
   socials: [
-    { label: "Facebook", href: "https://www.facebook.com/thecarpetcellar", icon: "facebook" },
+    {
+      label: "Facebook",
+      href: "https://www.facebook.com/profile.php?id=61582328190916&mibextid=wwXIfr&rdid=k7stD13fPv3DJghe&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F18pVw4ghfe%2F%3Fmibextid%3DwwXIfr#",
+      icon: "facebook",
+    },
     { label: "Twitter", href: "https://twitter.com/TheCarpetCellar", icon: "twitter" },
-    { label: "Instagram", href: "https://www.instagram.com/carpetcellar/", icon: "instagram" },
-    { label: "Instagram (secondary)", href: "https://www.instagram.com/thecarpetcellar/", icon: "instagram" },
+    { label: "Instagram", href: "https://www.instagram.com/unique_carpet_doha?utm_source=qr", icon: "instagram" },
+    { label: "TikTok", href: "https://www.tiktok.com/@unique.carpet?_r=1&_t=ZS-99LSGYa9nAi", icon: "tiktok" },
   ],
   // Distinct legal entity name shown in the source — left unchanged, it is not the brand name.
   copyright: "Woolsheel Traders Pvt. Ltd",
