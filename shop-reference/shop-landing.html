@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Shop — reference layout</title>
+<!--
+  REAL markup, trimmed to layout-relevant parts only. This is the pattern
+  the Shop landing page (/shop) should follow going forward — a grid of
+  CATEGORY cards, not a product grid. Head plugin CSS/JS, WP/Elementor
+  bloat removed.
+-->
+</head>
+<body>
+
+<!-- Shared Navbar (already exists in the project) -->
+
+<!-- Page heading -->
+<section class="page-title">
+  <h1>Shop</h1>
+</section>
+
+<!--
+  CATEGORY CARD GRID — this is the core pattern to replicate.
+  Each card:
+    - full-bleed background image (cover), same image reused per card in
+      this reference source is a stylistic accident of the original site
+      (they used one placeholder photo for every card) — in the real
+      build, use each category's own image from the category data
+    - a small icon above the title (category-relevant icon, optional —
+      can be dropped if it adds noise, use judgement)
+    - category title, centered, bold
+    - "See More" button/link with a right-arrow icon, centered, links to
+      that category's product listing page
+  Cards sit in a responsive grid (multi-column desktop, 1-2 columns
+  mobile), consistent card height, image covers the full card.
+-->
+<section class="category-grid">
+
+  <a href="/category/{slug}" class="category-card">
+    <div class="category-card-bg" style="background-image:url([category image])"></div>
+    <div class="category-card-overlay"></div>
+    <div class="category-card-content">
+      <div class="category-card-icon"><!-- optional icon --></div>
+      <h3 class="category-card-title">Category Name</h3>
+      <div class="category-card-description"><!-- optional short line, often empty in source --></div>
+      <span class="category-card-cta">
+        See More <span class="arrow-icon">&rarr;</span>
+      </span>
+    </div>
+  </a>
+
+  <!-- repeated once per category, pulled from the site's category data —
+       NOT hardcoded, must map over the existing categories list -->
+
+</section>
+
+<!-- Shared Footer (already exists in the project) -->
+
+</body>
+</html>
