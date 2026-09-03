@@ -2,24 +2,33 @@
 // confused with the *.service.ts architectural layer convention used
 // across all modules.
 
-// `steps` arrives as a JSON string from the multipart form (the image
-// itself comes from `req.file`, never the body), so it stays typed as
-// `string` here and gets JSON.parse()'d in the service layer.
+import type { IStep } from "./service.model.js";
+import type { CloudinaryImageInput } from "../../common/utils/cloudinaryImage.js";
+
+// The dashboard uploads images straight to Cloudinary and sends back the
+// resulting {url, publicId}. `image`/`contentImage` are omitted when the
+// admin didn't pick a new file (leave untouched); `slideImages`, like
+// product's `images`, is always sent as the full desired list.
 
 export interface CreateServiceBody {
   title?: string;
   intro?: string;
-  steps?: string;
+  steps?: IStep[];
   contentTitle?: string;
+  image?: CloudinaryImageInput;
+  contentImage?: CloudinaryImageInput;
+  slideImages?: CloudinaryImageInput[];
 }
 
 export interface UpdateServiceBody {
   title?: string;
   intro?: string;
-  steps?: string;
+  steps?: IStep[];
   isActive?: string | boolean;
   contentTitle?: string;
-  removeSlideImagePublicIds?: string;
+  image?: CloudinaryImageInput;
+  contentImage?: CloudinaryImageInput;
+  slideImages?: CloudinaryImageInput[];
 }
 
 export interface DeleteServiceResponse {

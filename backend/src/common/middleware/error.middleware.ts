@@ -1,7 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import multer from "multer";
 import { HttpError } from "../utils/httpError.js";
-import { MAX_FILE_SIZE_MB } from "./upload.middleware.js";
 
 export function notFound(req: Request, res: Response, next: NextFunction): void {
   res.status(404);
@@ -16,34 +14,39 @@ export function errorHandler(
 ): void {
   // Mongoose bad ObjectId
   const isCastError = err.name === "CastError";
-  const isMulterError = err instanceof multer.MulterError;
 
-  // Service-layer errors carry their own status code; Multer's own errors
-  // (bad upload shape — oversize file, too many files, wrong field name)
-  // otherwise landed here as a plain Error and fell through to a generic
-  // 500, which read as a server crash rather than a validation problem.
-  // Otherwise fall back to whatever a controller already set via
-  // res.status() before throwing, or 500 if nothing set it.
+  // Service-layer errors carry their own status code. Otherwise fall back
+  // to whatever a controller already set via res.status() before
+  // throwing, or 500 if nothing set it.
   const statusCode = isCastError
     ? 404
     : err instanceof HttpError
       ? err.statusCode
-      : isMulterError
-        ? (err as multer.MulterError).code === "LIMIT_FILE_SIZE"
-          ? 413
-          : 400
-        : res.statusCode && res.statusCode !== 200
-          ? res.statusCode
-          : 500;
+      : res.statusCode && res.statusCode !== 200
+        ? res.statusCode
+        : 500;
+
+  // A known error (CastError, or an HttpError thrown deliberately by a
+  // service/controller) always carries a safe, user-facing message.
+  // Anything else reached this handler unexpectedly, so its raw message
+  // may contain internals (DB/SMTP/Cloudinary error text, file paths)
+  // that shouldn't be echoed back to the client in production — log it
+  // server-side and return a generic message instead.
+  const isKnownError = isCastError || err instanceof HttpError;
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (!isKnownError && isProduction) {
+    console.error(err);
+  }
 
   const message = isCastError
     ? "Resource not found"
-    : isMulterError && (err as multer.MulterError).code === "LIMIT_FILE_SIZE"
-      ? `Image size must be under ${MAX_FILE_SIZE_MB}MB`
+    : !isKnownError && isProduction
+      ? "Internal server error"
       : err.message;
 
   res.status(statusCode).json({
     message,
-    stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    stack: isProduction ? undefined : err.stack,
   });
 }

@@ -1,24 +1,28 @@
-// `sizes` and `removeImagePublicIds` arrive as JSON strings from the
-// multipart form (the actual image files come from `req.files`, never the
-// body), so both stay typed as `string` here and get JSON.parse()'d in
-// the service layer.
+import type { ISize } from "./product.model.js";
+import type { CloudinaryImageInput } from "../../common/utils/cloudinaryImage.js";
+
+// The dashboard uploads images straight to Cloudinary and sends back the
+// full desired `images` array (kept existing ones + newly uploaded ones,
+// in the order they should appear) — the service layer diffs it against
+// what's currently saved to know which Cloudinary assets were dropped.
 
 export interface CreateProductBody {
   title?: string;
   description?: string;
   category?: string;
-  sizes?: string;
+  sizes?: ISize[];
   homepageSection?: string;
+  images?: CloudinaryImageInput[];
 }
 
 export interface UpdateProductBody {
   title?: string;
   description?: string;
   category?: string;
-  sizes?: string;
+  sizes?: ISize[];
   isActive?: string | boolean;
-  removeImagePublicIds?: string;
   homepageSection?: string;
+  images?: CloudinaryImageInput[];
 }
 
 // Query params always arrive as strings (or are absent) regardless of the

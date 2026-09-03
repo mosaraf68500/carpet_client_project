@@ -4,22 +4,14 @@ import ProductModel from "../product/product.model.js";
 import cloudinary from "../../common/config/cloudinary.js";
 import { slugify } from "../../common/utils/slugify.js";
 import { HttpError } from "../../common/utils/httpError.js";
-import type { CategoryQuery } from "./category.types.js";
+import { assertValidCloudinaryImage } from "../../common/utils/cloudinaryImage.js";
+import type { CreateCategoryBody, UpdateCategoryBody, CategoryQuery } from "./category.types.js";
 
 // Framework-agnostic business logic — no req/res here so this stays
 // testable independently of Express.
 
-export interface CreateCategoryInput {
-  name?: string;
-  file?: Express.Multer.File;
-  parentCategory?: string;
-}
-
-export interface UpdateCategoryInput {
-  name?: string;
-  file?: Express.Multer.File;
-  parentCategory?: string;
-}
+export type CreateCategoryInput = CreateCategoryBody;
+export type UpdateCategoryInput = UpdateCategoryBody;
 
 // Shared by create/update: resolves the "parentCategory" form field (a
 // string id, or empty/undefined for "no parent") into either null or a
@@ -63,7 +55,7 @@ export async function getCategoryBySlug(slug: string): Promise<ICategory> {
 }
 
 export async function createCategory(data: CreateCategoryInput): Promise<ICategory> {
-  const { name, file, parentCategory } = data;
+  const { name, image, parentCategory } = data;
 
   if (!name) {
     throw new HttpError("Category name is required", 400);
@@ -80,7 +72,7 @@ export async function createCategory(data: CreateCategoryInput): Promise<ICatego
   return Category.create({
     name,
     slug,
-    image: file ? { url: file.path, publicId: file.filename } : undefined,
+    image: image ? assertValidCloudinaryImage(image) : undefined,
     parentCategory: resolvedParent,
   });
 }
@@ -106,12 +98,13 @@ export async function updateCategory(id: string, data: UpdateCategoryInput): Pro
     category.parentCategory = await resolveParentCategory(data.parentCategory);
   }
 
-  if (data.file) {
+  if (data.image) {
+    const validated = assertValidCloudinaryImage(data.image);
     // remove the old Cloudinary asset before attaching the new one
-    if (category.image?.publicId) {
+    if (category.image?.publicId && category.image.publicId !== validated.publicId) {
       await cloudinary.uploader.destroy(category.image.publicId).catch(() => {});
     }
-    category.image = { url: data.file.path, publicId: data.file.filename };
+    category.image = validated;
   }
 
   await category.save();

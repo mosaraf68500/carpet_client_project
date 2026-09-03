@@ -1,9 +1,10 @@
 import mongoose, { type FilterQuery } from "mongoose";
-import Product, { type IProduct, type ISize, type IProductImage } from "./product.model.js";
+import Product, { type IProduct, type ISize } from "./product.model.js";
 import CategoryModel from "../category/category.model.js";
 import cloudinary from "../../common/config/cloudinary.js";
 import { slugify } from "../../common/utils/slugify.js";
 import { HttpError } from "../../common/utils/httpError.js";
+import { assertValidCloudinaryImages } from "../../common/utils/cloudinaryImage.js";
 import type {
   CreateProductBody,
   UpdateProductBody,
@@ -15,13 +16,8 @@ import type {
 // Framework-agnostic business logic — no req/res here so this stays
 // testable independently of Express.
 
-export interface CreateProductInput extends CreateProductBody {
-  files?: Express.Multer.File[];
-}
-
-export interface UpdateProductInput extends UpdateProductBody {
-  files?: Express.Multer.File[];
-}
+export type CreateProductInput = CreateProductBody;
+export type UpdateProductInput = UpdateProductBody;
 
 const HOMEPAGE_SECTIONS = ["bestselling", "curated", "spotlight"] as const;
 type HomepageSection = (typeof HOMEPAGE_SECTIONS)[number];
@@ -151,7 +147,7 @@ export async function getAllProductsForAdmin(
 }
 
 export async function createProduct(data: CreateProductInput): Promise<IProduct> {
-  const { title, description, category, sizes, homepageSection, files } = data;
+  const { title, description, category, sizes, homepageSection, images } = data;
 
   if (!title || !category) {
     throw new HttpError("Title and category are required", 400);
@@ -168,18 +164,13 @@ export async function createProduct(data: CreateProductInput): Promise<IProduct>
     throw new HttpError("A product with this title already exists", 400);
   }
 
-  const images: IProductImage[] = (files ?? []).map((f) => ({
-    url: f.path,
-    publicId: f.filename,
-  }));
-
   return Product.create({
     title,
     slug,
     description,
     category: category as unknown as mongoose.Types.ObjectId,
-    sizes: sizes ? (JSON.parse(sizes) as ISize[]) : [],
-    images,
+    sizes: sizes ?? [],
+    images: assertValidCloudinaryImages(images),
     homepageSection: resolveHomepageSection(homepageSection),
   });
 }
@@ -190,8 +181,7 @@ export async function updateProduct(id: string, data: UpdateProductInput): Promi
     throw new HttpError("Product not found", 404);
   }
 
-  const { title, description, category, sizes, isActive, removeImagePublicIds, homepageSection, files } =
-    data;
+  const { title, description, category, sizes, isActive, homepageSection, images } = data;
 
   if (title) {
     product.title = title;
@@ -199,7 +189,7 @@ export async function updateProduct(id: string, data: UpdateProductInput): Promi
   }
   if (description !== undefined) product.description = description;
   if (category) product.category = category as unknown as mongoose.Types.ObjectId;
-  if (sizes) product.sizes = JSON.parse(sizes) as ISize[];
+  if (sizes) product.sizes = sizes;
   if (isActive !== undefined) product.isActive = isActive === "true" || isActive === true;
   // Distinguish "field not sent" (leave untouched) from "sent as empty
   // string/none" (explicitly clear it back to unfeatured) — same pattern
@@ -208,19 +198,18 @@ export async function updateProduct(id: string, data: UpdateProductInput): Promi
     product.homepageSection = resolveHomepageSection(homepageSection);
   }
 
-  // remove selected existing images
-  if (removeImagePublicIds) {
-    const idsToRemove: string[] = JSON.parse(removeImagePublicIds);
-    for (const publicId of idsToRemove) {
-      await cloudinary.uploader.destroy(publicId).catch(() => {});
+  // The dashboard always sends the full desired image list (existing ones
+  // it kept + newly uploaded ones) rather than an incremental add/remove —
+  // whatever public ID was on the product before but isn't in that list
+  // anymore was dropped, so its Cloudinary asset gets cleaned up here.
+  if (images) {
+    const validated = assertValidCloudinaryImages(images);
+    const keptIds = new Set(validated.map((img) => img.publicId));
+    const removed = product.images.filter((img) => !keptIds.has(img.publicId));
+    for (const img of removed) {
+      await cloudinary.uploader.destroy(img.publicId).catch(() => {});
     }
-    product.images = product.images.filter((img) => !idsToRemove.includes(img.publicId));
-  }
-
-  // append newly uploaded images
-  if (files?.length) {
-    const newImages: IProductImage[] = files.map((f) => ({ url: f.path, publicId: f.filename }));
-    product.images.push(...newImages);
+    product.images = validated;
   }
 
   await product.save();

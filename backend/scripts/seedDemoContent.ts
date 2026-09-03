@@ -2,16 +2,20 @@ import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import cloudinary from "../src/common/config/cloudinary.js";
 
 // One-off demo-content seed script — NOT part of the normal build/dev flow
 // (lives outside src/, only wired into package.json as an optional
 // "seed:demo" script). Talks to the ALREADY-RUNNING local backend over
 // HTTP through the real public/admin endpoints (login, then the same
-// multipart create-category/create-product/create-service contracts the
-// dashboard itself uses) rather than writing to MongoDB directly, so every
-// image goes through the real Cloudinary pipeline and everything created
-// here is visible/editable/deletable via the dashboard afterward exactly
-// like real content would be.
+// JSON create-category/create-product/create-service contracts the
+// dashboard itself uses — each image is uploaded to Cloudinary directly
+// from this script, mirroring what the dashboard's browser-side upload
+// does, and only the resulting {url, publicId} is sent to the backend)
+// rather than writing to MongoDB directly, so every image goes through the
+// real Cloudinary pipeline and everything created here is
+// visible/editable/deletable via the dashboard afterward exactly like real
+// content would be.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ATTRIBUTION_LOG_PATH = path.join(__dirname, "seed-image-attributions.log");
@@ -29,7 +33,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const OPENVERSE_SEARCH_URL = "https://api.openverse.org/v1/images/";
 const ACCEPTABLE_LICENSES = new Set(["cc0", "pdm", "by", "by-sa"]);
 const MIN_WIDTH = 1000;
-const MAX_FILESIZE = 4.5 * 1024 * 1024; // stay under the backend's 5MB/file multer limit
+const MAX_FILESIZE = 4.5 * 1024 * 1024; // stay comfortably under Cloudinary's 8MB upload preset limit
 const ALLOWED_CONTENT_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 const poorResultQueries: string[] = [];
@@ -126,11 +130,11 @@ async function fetchImage(queries: string[]): Promise<FetchedImage | null> {
         const buffer = Buffer.from(await imgRes.arrayBuffer());
         // Openverse's `filesize` field is frequently missing, so the
         // pre-download filter above can't always catch an over-limit file —
-        // check the real downloaded size too, against the backend's 5MB/file
-        // multer cap, before attempting the upload.
+        // check the real downloaded size too, against MAX_FILESIZE, before
+        // attempting the upload.
         if (buffer.length > MAX_FILESIZE) {
           console.warn(
-            `  Skipping ${candidate.url} — downloaded size ${(buffer.length / 1024 / 1024).toFixed(1)}MB exceeds the 5MB upload limit`
+            `  Skipping ${candidate.url} — downloaded size ${(buffer.length / 1024 / 1024).toFixed(1)}MB exceeds the upload limit`
           );
           continue;
         }
@@ -146,8 +150,32 @@ async function fetchImage(queries: string[]): Promise<FetchedImage | null> {
   return null;
 }
 
-function toBlob(image: FetchedImage): Blob {
-  return new Blob([new Uint8Array(image.buffer)], { type: image.contentType });
+interface UploadedImage {
+  url: string;
+  publicId: string;
+}
+
+// Mirrors what the dashboard's browser-side upload does (upload straight
+// to Cloudinary, then hand the backend only the resulting URL) — this
+// script has the account's API secret available (from backend/.env) so it
+// uploads via the regular signed `cloudinary.uploader.upload` rather than
+// the dashboard's unsigned preset.
+async function uploadImage(image: FetchedImage): Promise<UploadedImage> {
+  const dataUri = `data:${image.contentType};base64,${image.buffer.toString("base64")}`;
+  const result = await cloudinary.uploader.upload(dataUri, {
+    folder: "doha-carpet",
+    resource_type: "image",
+    transformation: [{ width: 1600, crop: "limit" }],
+  });
+  return { url: result.secure_url, publicId: result.public_id };
+}
+
+function jsonFetch(url: string, token: string, method: string, body: unknown): Promise<Response> {
+  return fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify(body),
+  });
 }
 
 // ---- Auth ----
@@ -203,20 +231,13 @@ async function getOrCreateCategories(token: string): Promise<Record<string, stri
     }
 
     console.log(`- Creating "${plan.name}"...`);
-    const image = await fetchImage(plan.imageQueries);
-    if (!image) {
+    const fetched = await fetchImage(plan.imageQueries);
+    if (!fetched) {
       console.warn(`  No image found for "${plan.name}" after all fallbacks — creating without an image.`);
     }
+    const image = fetched ? await uploadImage(fetched) : undefined;
 
-    const form = new FormData();
-    form.append("name", plan.name);
-    if (image) form.append("image", toBlob(image), image.filename);
-
-    const createRes = await fetch(`${BASE_URL}/categories`, {
-      method: "POST",
-      headers: authHeaders(token),
-      body: form,
-    });
+    const createRes = await jsonFetch(`${BASE_URL}/categories`, token, "POST", { name: plan.name, image });
     if (!createRes.ok) {
       console.error(`  Failed to create category "${plan.name}": ${createRes.status} ${await createRes.text()}`);
       continue;
@@ -418,31 +439,25 @@ async function createProducts(
     }
 
     console.log(`- Creating "${plan.title}"...`);
-    const images: FetchedImage[] = [];
+    const fetchedImages: FetchedImage[] = [];
     for (const queries of plan.imageQueries) {
       const image = await fetchImage(queries);
       if (image) {
-        images.push(image);
+        fetchedImages.push(image);
       } else {
         console.warn(`  No image found for one of "${plan.title}"'s image slots after all fallbacks — skipping that slot.`);
       }
     }
-
-    const form = new FormData();
-    form.append("title", plan.title);
-    form.append("description", plan.description);
-    form.append("category", categoryId);
-    form.append("sizes", JSON.stringify(plan.sizes));
-    if (plan.homepageSection) form.append("homepageSection", plan.homepageSection);
-    for (const image of images) {
-      form.append("images", toBlob(image), image.filename);
-    }
+    const images = await Promise.all(fetchedImages.map(uploadImage));
 
     try {
-      const res = await fetch(`${BASE_URL}/products`, {
-        method: "POST",
-        headers: authHeaders(token),
-        body: form,
+      const res = await jsonFetch(`${BASE_URL}/products`, token, "POST", {
+        title: plan.title,
+        description: plan.description,
+        category: categoryId,
+        sizes: plan.sizes,
+        homepageSection: plan.homepageSection || undefined,
+        images,
       });
       if (!res.ok) {
         console.error(`  Failed to create "${plan.title}": ${res.status} ${await res.text()}`);
@@ -586,22 +601,18 @@ async function createServices(token: string): Promise<{ created: string[]; skipp
     }
 
     console.log(`- Creating "${plan.slug}"...`);
-    const image = await fetchImage(plan.imageQueries);
-    if (!image) {
+    const fetched = await fetchImage(plan.imageQueries);
+    if (!fetched) {
       console.warn(`  No image found for "${plan.slug}" after all fallbacks — creating without an image.`);
     }
-
-    const form = new FormData();
-    form.append("title", plan.title);
-    form.append("intro", plan.intro);
-    form.append("steps", JSON.stringify(plan.steps));
-    if (image) form.append("image", toBlob(image), image.filename);
+    const image = fetched ? await uploadImage(fetched) : undefined;
 
     try {
-      const createRes = await fetch(`${BASE_URL}/services`, {
-        method: "POST",
-        headers: authHeaders(token),
-        body: form,
+      const createRes = await jsonFetch(`${BASE_URL}/services`, token, "POST", {
+        title: plan.title,
+        intro: plan.intro,
+        steps: plan.steps,
+        image,
       });
       if (!createRes.ok) {
         console.error(`  Failed to create "${plan.slug}": ${createRes.status} ${await createRes.text()}`);

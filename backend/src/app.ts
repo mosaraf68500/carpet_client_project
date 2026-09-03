@@ -21,11 +21,29 @@ import appointmentRoutes from "./modules/appointment/appointment.routes.js";
 
 const app = express();
 
+// Allowed origins come from env vars so production domains are configured
+// per-deploy (e.g. Vercel dashboard) without touching code. ALLOWED_ORIGINS
+// takes a comma-separated list for any number of production domains;
+// CLIENT_URL/DASHBOARD_URL stay supported for backward compatibility. In
+// development, localhost is always allowed even if no env var is set.
+const envOrigins = [
+  process.env.CLIENT_URL,
+  process.env.DASHBOARD_URL,
+  ...(process.env.ALLOWED_ORIGINS?.split(",") ?? []),
+]
+  .map((origin) => origin?.trim())
+  .filter((origin): origin is string => Boolean(origin));
+
+const devOrigins =
+  process.env.NODE_ENV === "development"
+    ? ["http://localhost:3000", "http://localhost:3001"]
+    : [];
+
+const allowedOrigins = Array.from(new Set([...envOrigins, ...devOrigins]));
+
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, process.env.DASHBOARD_URL].filter(
-      (origin): origin is string => Boolean(origin)
-    ),
+    origin: allowedOrigins,
     credentials: true,
   })
 );

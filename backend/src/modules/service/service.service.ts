@@ -2,26 +2,18 @@
 // confused with the *.service.ts architectural layer convention used
 // across all modules — this file IS that layer, for that resource.
 
-import ServiceModel, { type IService, type IStep, type IServiceImage } from "./service.model.js";
+import ServiceModel, { type IService } from "./service.model.js";
 import cloudinary from "../../common/config/cloudinary.js";
 import { slugify } from "../../common/utils/slugify.js";
 import { HttpError } from "../../common/utils/httpError.js";
+import { assertValidCloudinaryImage, assertValidCloudinaryImages } from "../../common/utils/cloudinaryImage.js";
 import type { CreateServiceBody, UpdateServiceBody } from "./service.types.js";
 
 // Framework-agnostic business logic — no req/res here so this stays
 // testable independently of Express.
 
-export interface CreateServiceInput extends CreateServiceBody {
-  image?: Express.Multer.File;
-  contentImage?: Express.Multer.File;
-  slideImages?: Express.Multer.File[];
-}
-
-export interface UpdateServiceInput extends UpdateServiceBody {
-  image?: Express.Multer.File;
-  contentImage?: Express.Multer.File;
-  slideImages?: Express.Multer.File[];
-}
+export type CreateServiceInput = CreateServiceBody;
+export type UpdateServiceInput = UpdateServiceBody;
 
 export async function getServices(): Promise<IService[]> {
   return ServiceModel.find({ isActive: true }).sort({ title: 1 });
@@ -52,26 +44,15 @@ export async function createService(data: CreateServiceInput): Promise<IService>
     throw new HttpError("A service with this title already exists", 400);
   }
 
-  const heroImage: IServiceImage | undefined = image
-    ? { url: image.path, publicId: image.filename }
-    : undefined;
-  const sectionImage: IServiceImage | undefined = contentImage
-    ? { url: contentImage.path, publicId: contentImage.filename }
-    : undefined;
-  const slides: IServiceImage[] = (slideImages ?? []).map((f) => ({
-    url: f.path,
-    publicId: f.filename,
-  }));
-
   return ServiceModel.create({
     title,
     slug,
     intro,
-    steps: steps ? (JSON.parse(steps) as IStep[]) : [],
-    image: heroImage,
+    steps: steps ?? [],
+    image: image ? assertValidCloudinaryImage(image) : undefined,
     contentTitle,
-    contentImage: sectionImage,
-    slideImages: slides,
+    contentImage: contentImage ? assertValidCloudinaryImage(contentImage) : undefined,
+    slideImages: assertValidCloudinaryImages(slideImages),
   });
 }
 
@@ -81,45 +62,45 @@ export async function updateService(id: string, data: UpdateServiceInput): Promi
     throw new HttpError("Service not found", 404);
   }
 
-  const { title, intro, steps, isActive, contentTitle, image, contentImage, slideImages, removeSlideImagePublicIds } =
-    data;
+  const { title, intro, steps, isActive, contentTitle, image, contentImage, slideImages } = data;
 
   if (title) {
     service.title = title;
     service.slug = slugify(title);
   }
   if (intro !== undefined) service.intro = intro;
-  if (steps) service.steps = JSON.parse(steps) as IStep[];
+  if (steps) service.steps = steps;
   if (contentTitle !== undefined) service.contentTitle = contentTitle;
   if (isActive !== undefined) service.isActive = isActive === "true" || isActive === true;
 
   if (image) {
-    if (service.image?.publicId) {
+    const validated = assertValidCloudinaryImage(image);
+    if (service.image?.publicId && service.image.publicId !== validated.publicId) {
       await cloudinary.uploader.destroy(service.image.publicId).catch(() => {});
     }
-    service.image = { url: image.path, publicId: image.filename };
+    service.image = validated;
   }
 
   if (contentImage) {
-    if (service.contentImage?.publicId) {
+    const validated = assertValidCloudinaryImage(contentImage);
+    if (service.contentImage?.publicId && service.contentImage.publicId !== validated.publicId) {
       await cloudinary.uploader.destroy(service.contentImage.publicId).catch(() => {});
     }
-    service.contentImage = { url: contentImage.path, publicId: contentImage.filename };
+    service.contentImage = validated;
   }
 
-  // slideImages is a growing collection, not one replaceable photo — remove
-  // selected existing slides, then append newly uploaded ones, same pattern
-  // as product.service.ts's images/removeImagePublicIds handling.
-  if (removeSlideImagePublicIds) {
-    const idsToRemove: string[] = JSON.parse(removeSlideImagePublicIds);
-    for (const publicId of idsToRemove) {
-      await cloudinary.uploader.destroy(publicId).catch(() => {});
+  // slideImages is a growing collection, not one replaceable photo — the
+  // dashboard always sends the full desired list (kept + newly uploaded),
+  // same "diff against what's currently saved" pattern as
+  // product.service.ts's images handling.
+  if (slideImages) {
+    const validated = assertValidCloudinaryImages(slideImages);
+    const keptIds = new Set(validated.map((img) => img.publicId));
+    const removed = service.slideImages.filter((img) => !keptIds.has(img.publicId));
+    for (const img of removed) {
+      await cloudinary.uploader.destroy(img.publicId).catch(() => {});
     }
-    service.slideImages = service.slideImages.filter((img) => !idsToRemove.includes(img.publicId));
-  }
-  if (slideImages?.length) {
-    const newSlides: IServiceImage[] = slideImages.map((f) => ({ url: f.path, publicId: f.filename }));
-    service.slideImages.push(...newSlides);
+    service.slideImages = validated;
   }
 
   await service.save();

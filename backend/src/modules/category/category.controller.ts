@@ -31,11 +31,7 @@ export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response
 // @route POST /api/categories  (protected)
 export const createCategory = asyncHandler(
   async (req: Request<unknown, unknown, CreateCategoryBody>, res: Response) => {
-    const category = await createCategoryService({
-      name: req.body.name,
-      file: req.file,
-      parentCategory: req.body.parentCategory,
-    });
+    const category = await createCategoryService(req.body);
     res.status(201).json(category);
   }
 );
@@ -43,11 +39,7 @@ export const createCategory = asyncHandler(
 // @route PUT /api/categories/:id  (protected)
 export const updateCategory = asyncHandler(
   async (req: Request<{ id: string }, unknown, UpdateCategoryBody>, res: Response) => {
-    const category = await updateCategoryService(req.params.id, {
-      name: req.body.name,
-      file: req.file,
-      parentCategory: req.body.parentCategory,
-    });
+    const category = await updateCategoryService(req.params.id, req.body);
     res.json(category);
   }
 );

@@ -42,10 +42,7 @@ export const getAllProductsForAdmin = asyncHandler(
 // @route POST /api/products  (protected)
 export const createProduct = asyncHandler(
   async (req: Request<unknown, unknown, CreateProductBody>, res: Response) => {
-    const product = await createProductService({
-      ...req.body,
-      files: req.files as Express.Multer.File[] | undefined,
-    });
+    const product = await createProductService(req.body);
     res.status(201).json(product);
   }
 );
@@ -53,10 +50,7 @@ export const createProduct = asyncHandler(
 // @route PUT /api/products/:id  (protected)
 export const updateProduct = asyncHandler(
   async (req: Request<{ id: string }, unknown, UpdateProductBody>, res: Response) => {
-    const product = await updateProductService(req.params.id, {
-      ...req.body,
-      files: req.files as Express.Multer.File[] | undefined,
-    });
+    const product = await updateProductService(req.params.id, req.body);
     res.json(product);
   }
 );
