@@ -6,8 +6,8 @@ import { footer } from "@/data/siteContent";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Contact Us | Doha Furniture أثاث الدوحة",
-  description: "Get in touch with Doha Furniture أثاث الدوحة by WhatsApp, phone, email, or the contact form below.",
+  title: "Contact Us | Doha Carpet سجاد الدوحة",
+  description: "Get in touch with Doha Carpet سجاد الدوحة by WhatsApp, phone, email, or the contact form below.",
   path: "/contact/",
 });
 

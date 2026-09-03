@@ -31,8 +31,8 @@ export async function generateMetadata({ params }) {
     return {};
   }
   return buildMetadata({
-    title: `${category.name} | Shop | Doha Furniture أثاث الدوحة`,
-    description: `Shop ${category.name} at Doha Furniture أثاث الدوحة — handcrafted carpets, rugs, and textiles.`,
+    title: `${category.name} | Shop | Doha Carpet سجاد الدوحة`,
+    description: `Shop ${category.name} at Doha Carpet سجاد الدوحة — handcrafted carpets, rugs, and textiles.`,
     path: `/product-category/${slug}/`,
     image: category.image?.url || undefined,
   });

@@ -6,23 +6,23 @@
 // was lost — this file replaces that one, which no longer has any consumer.
 export const servicesStaticContent = {
   installation: {
-    metaTitle: "Carpet Installation Services | Doha Furniture أثاث الدوحة",
+    metaTitle: "Carpet Installation Services | Doha Carpet سجاد الدوحة",
     metaDescription:
       "Professional measuring, delivery and fitting for hand-knotted carpets and rugs — book carpet installation with our specialists in Doha.",
     ctaHeading: "Ready to get your rug installed?",
     ctaText: "Get in touch and we'll take care of the rest, from measuring to the final walkthrough.",
   },
   fixing: {
-    metaTitle: "Carpet Repair & Restoration | Doha Furniture أثاث الدوحة",
+    metaTitle: "Carpet Repair & Restoration | Doha Carpet سجاد الدوحة",
     metaDescription:
       "Expert carpet and rug repair — edge re-binding, patching and re-weaving — from our restoration specialists in Doha.",
     ctaHeading: "Ready to have your carpet repaired?",
     ctaText: "Send us a few photos or book an assessment, and we'll take it from there.",
   },
   delivery: {
-    metaTitle: "Carpet Delivery Service | Doha Furniture أثاث الدوحة",
+    metaTitle: "Carpet Delivery Service | Doha Carpet سجاد الدوحة",
     metaDescription:
-      "Careful, tracked delivery and in-home placement for every carpet and rug order from Doha Furniture أثاث الدوحة.",
+      "Careful, tracked delivery and in-home placement for every carpet and rug order from Doha Carpet سجاد الدوحة.",
     ctaHeading: "Ready to place your order?",
     ctaText: "Browse the collection or get in touch, and we'll take care of getting it to you safely.",
   },

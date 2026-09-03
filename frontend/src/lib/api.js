@@ -1,4 +1,4 @@
-// Single source of truth for calling the Doha Furniture backend from the
+// Single source of truth for calling the Doha Carpet backend from the
 // public frontend. Public endpoints only — no auth headers, no token (see
 // dashboard/src/lib/api.js for the admin-side equivalent, which does need
 // those). Paths below are verified against the real route files
@@ -58,6 +58,14 @@ export function getProductBySlug(slug) {
   return request(`/products/${slug}`);
 }
 
+// Navbar live-search dropdown. Backend does a case-insensitive partial
+// match on title/description and ignores `search` entirely below 2
+// characters (falls back to the regular listing) — callers should still
+// debounce and gate on length client-side rather than relying on that.
+export function searchProducts(query, { limit = 6 } = {}) {
+  return getProducts({ search: query, limit });
+}
+
 // Loops through every page since a single call's `limit` can't be assumed
 // to cover the whole catalog. For places that need the full product list
 // (sitemap generation, static param generation) — not for paginated UI
@@ -74,18 +82,27 @@ export async function getAllProducts() {
 
 // ---- Services ----
 
-export function getServices() {
-  return request("/services");
-}
-
 export function getServiceBySlug(slug) {
   return request(`/services/${slug}`);
 }
 
 // ---- Contact ----
 
-export function submitContact(payload) {
+// `source` tells the backend which frontend form this came from
+// ("contact" or "quote") so the dashboard's Messages inbox can tell them
+// apart. Defaults to "contact" since ContactForm is the plain inquiry form.
+export function submitContact(payload, source = "contact") {
   return request("/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...payload, source }),
+  });
+}
+
+// ---- Appointments ----
+
+export function submitAppointment(payload) {
+  return request("/appointments", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

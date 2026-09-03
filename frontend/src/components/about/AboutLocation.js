@@ -58,7 +58,7 @@ export default function AboutLocation() {
         <div className="aspect-3/2 w-full overflow-hidden sm:aspect-video">
           <iframe
             src={mapSrc}
-            title={`Map to Doha Furniture أثاث الدوحة — ${aboutLocation.heading}`}
+            title={`Map to Doha Carpet سجاد الدوحة — ${aboutLocation.heading}`}
             className="h-full w-full border-0"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

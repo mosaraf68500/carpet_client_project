@@ -4,8 +4,8 @@ import { termsContent } from "@/data/legalContent";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Terms & Conditions | Doha Furniture أثاث الدوحة",
-  description: "The terms and conditions for using Doha Furniture أثاث الدوحة's website and services.",
+  title: "Terms & Conditions | Doha Carpet سجاد الدوحة",
+  description: "The terms and conditions for using Doha Carpet سجاد الدوحة's website and services.",
   path: "/terms-conditions/",
 });
 

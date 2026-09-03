@@ -6,7 +6,7 @@ import { faqTitleBar, faqs } from "@/data/faqContent";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "FAQs | Doha Furniture أثاث الدوحة",
+  title: "FAQs | Doha Carpet سجاد الدوحة",
   description: "Answers to common questions about our handmade rugs, sizing, customization, delivery, and appointments.",
   path: "/faqs/",
 });

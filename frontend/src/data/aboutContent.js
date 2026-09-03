@@ -2,7 +2,7 @@
 // about page (client-provided screenshots) — this replaces the earlier
 // invented placeholder (reference-html/about.html was a stub with no real
 // markup to build from). Brand references in the transcribed copy are
-// updated from "The Carpet Cellar" to the Doha Furniture أثاث الدوحة
+// updated from "The Carpet Cellar" to the Doha Carpet سجاد الدوحة
 // rebrand, same treatment already used for the real copy in
 // siteContent.aboutSection.
 import { footer } from "./siteContent";
@@ -17,7 +17,7 @@ export const aboutTitleBar = {
 
 export const aboutHero = {
   image: "/images/The-Carpet-Cellar-Buy-Carpets-Online-1.jpg",
-  alt: "A Doha Furniture أثاث الدوحة hand-knotted carpet styled beneath a living room sofa",
+  alt: "A Doha Carpet سجاد الدوحة hand-knotted carpet styled beneath a living room sofa",
 };
 
 export const aboutStory = {
@@ -25,17 +25,17 @@ export const aboutStory = {
     {
       heading: "Sustainability and preservation – Cornerstones of our company",
       paragraphs: [
-        "One of our chief priorities is to be ethically responsible, whether in our sourcing, production or usage. As a brand, it is Doha Furniture أثاث الدوحة's conscious decision to periodically review and improve in these three areas.",
+        "One of our chief priorities is to be ethically responsible, whether in our sourcing, production or usage. As a brand, it is Doha Carpet سجاد الدوحة's conscious decision to periodically review and improve in these three areas.",
         "We know that nothing stands the test of time better than natural raw materials, when properly looked after. The antique pieces in our collection are testament to this, and so we base all our sourcing decisions on this.",
         "Our production techniques are thoughtful, gentle, and respectful to the environment and to the beautiful wools and silks we work with. We use sustainable age-old techniques, azo-free dyes, and are proud of our lower water consumption, thanks to the quality of the material.",
         "Our customers enjoy the benefits of these principles – the natural longevity of our hand-knotted carpets comes from robust materials and time-tested techniques. Your carpets are made to last for 50 years or more, significantly longer than machine-made or tufted rugs.",
       ],
     },
     {
-      heading: "Doha Furniture أثاث الدوحة today – A committed purveyor of rugs online",
+      heading: "Doha Carpet سجاد الدوحة today – A committed purveyor of rugs online",
       paragraphs: [
-        "Doha Furniture أثاث الدوحة has collaborated with eminent museums from around the world, and has been featured in several publications. We have also participated in various art and design fairs and been a part of premier displays of private collections. Our physical stores are landmarks in the art connoisseur circles and are frequented by astute collectors looking for their next acquisition.",
-        "When you buy rugs online or offline from Doha Furniture أثاث الدوحة, we provide certificates of authenticity to track genealogy of hand-knotted carpets, as well as approximate age and design details. But selling carpets is not our sole purpose – visitors and browsing aficionados come to Doha Furniture أثاث الدوحة to admire the collection, discover inspiration from bygone civilisations and artists, and often times, leave with their own piece of history.",
+        "Doha Carpet سجاد الدوحة has collaborated with eminent museums from around the world, and has been featured in several publications. We have also participated in various art and design fairs and been a part of premier displays of private collections. Our physical stores are landmarks in the art connoisseur circles and are frequented by astute collectors looking for their next acquisition.",
+        "When you buy rugs online or offline from Doha Carpet سجاد الدوحة, we provide certificates of authenticity to track genealogy of hand-knotted carpets, as well as approximate age and design details. But selling carpets is not our sole purpose – visitors and browsing aficionados come to Doha Carpet سجاد الدوحة to admire the collection, discover inspiration from bygone civilisations and artists, and often times, leave with their own piece of history.",
       ],
     },
   ],

@@ -4,8 +4,8 @@ import { footer } from "@/data/siteContent";
 // TODO: replace with the real production domain once the client confirms
 // where this deploys — every canonical/OG URL and JSON-LD @id below is
 // built from this one constant.
-export const SITE_URL = "https://www.dohafurniture.qa";
-export const SITE_NAME = "Doha Furniture أثاث الدوحة";
+export const SITE_URL = "https://www.dohacarpet.qa";
+export const SITE_NAME = "Doha Carpet سجاد الدوحة";
 
 export function absoluteUrl(path = "/") {
   return new URL(path, SITE_URL).toString();

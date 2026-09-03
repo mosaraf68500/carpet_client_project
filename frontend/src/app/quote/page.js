@@ -7,9 +7,9 @@ import { getProductBySlug, getProducts } from "@/lib/api";
 import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Request a Quote | Doha Furniture أثاث الدوحة",
+  title: "Request a Quote | Doha Carpet سجاد الدوحة",
   description:
-    "Tell us about the rug or carpet you have in mind and a Doha Furniture أثاث الدوحة specialist will get back to you with pricing and availability.",
+    "Tell us about the rug or carpet you have in mind and a Doha Carpet سجاد الدوحة specialist will get back to you with pricing and availability.",
   path: "/quote/",
 });
 

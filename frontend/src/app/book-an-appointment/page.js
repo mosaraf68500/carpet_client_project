@@ -5,8 +5,8 @@ import { appointmentTitleBar, appointmentIntro } from "@/data/appointmentContent
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Book An Appointment | Doha Furniture أثاث الدوحة",
-  description: "Book a one-on-one appointment with a Doha Furniture أثاث الدوحة specialist to view pieces in person.",
+  title: "Book An Appointment | Doha Carpet سجاد الدوحة",
+  description: "Book a one-on-one appointment with a Doha Carpet سجاد الدوحة specialist to view pieces in person.",
   path: "/book-an-appointment/",
 });
 

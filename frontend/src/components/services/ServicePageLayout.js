@@ -4,13 +4,15 @@ import ServiceSlideGallery from "./ServiceSlideGallery";
 
 // Generic trust-building copy, intentionally identical on all 3 service
 // pages (installation/fixing/delivery) rather than dashboard-controlled —
-// matches the reference design's "Why choose us" / "Our process" / "Our
-// promise" sections, which the client asked to keep the same everywhere.
-// Lightly reworded from the reference (which was written for the
-// Installation page specifically — "Professional Installation" as a list
-// item, "Installation" as process step 3) so the same copy reads sensibly
-// on Fixing/Delivery too; the brand name in the reference ("Doha Furniture
-// Market") was also corrected to this site's real name.
+// matches the reference design's "Why choose us" / "Our promise" sections,
+// which the client asked to keep the same everywhere. Lightly reworded from
+// the reference (which was written for the Installation page specifically —
+// "Professional Installation" as a list item) so the same copy reads
+// sensibly on Fixing/Delivery too; the brand name in the reference ("Doha
+// Furniture Market") was also corrected to this site's real name.
+// "Our Process" used to be a 4th hardcoded item here (OUR_PROCESS) — it's
+// now the dashboard-controlled `steps` prop instead, since there's no
+// reason each service's actual process should read identically.
 const WHY_CHOOSE_US = [
   { title: "Wide Variety of Designs & Colors", text: "Choose from modern, classic, and cultural patterns." },
   { title: "Premium Quality Materials", text: "Long-lasting carpets that resist wear and tear." },
@@ -19,15 +21,8 @@ const WHY_CHOOSE_US = [
   { title: "Affordable Pricing", text: "Luxury carpets and service at competitive rates." },
 ];
 
-const OUR_PROCESS = [
-  { title: "Consultation & Selection", text: "We help you choose the right option for your space." },
-  { title: "Measurement & Planning", text: "Accurate sizing and scheduling for a perfect fit." },
-  { title: "Careful Execution", text: "Our professional team ensures a smooth, precise result." },
-  { title: "Finishing Touches", text: "A clean, polished look that enhances your interiors." },
-];
-
 const OUR_PROMISE =
-  "At Doha Furniture أثاث الدوحة, we don't just sell carpets — we create comfort and elegance for your lifestyle. With our expert care, every carpet will look perfect from day one and stay beautiful for years to come.";
+  "At Doha Carpet سجاد الدوحة, we don't just sell carpets — we create comfort and elegance for your lifestyle. With our expert care, every carpet will look perfect from day one and stay beautiful for years to come.";
 
 // Shared structure for the 3 /services/[slug] pages, 5 sections:
 // 1. Hero image with the service name overlaid.
@@ -49,8 +44,10 @@ export default function ServicePageLayout({
   contentImage,
   contentImageAlt,
   slideImages = [],
+  steps = [],
 }) {
   const hasContentSection = Boolean(contentTitle || intro);
+  const hasSteps = steps.length > 0;
 
   return (
     <>
@@ -81,7 +78,10 @@ export default function ServicePageLayout({
       )}
 
       <section className="border-y border-border py-16">
-        <Container size="boxed" className="grid grid-cols-1 gap-10 md:grid-cols-2">
+        <Container
+          size="boxed"
+          className={`grid grid-cols-1 gap-10 ${hasSteps ? "md:grid-cols-2" : "mx-auto max-w-2xl"}`}
+        >
           <div className="rounded-xs bg-box-grey p-8">
             <h2 className="font-heading text-2xl">Why Choose Our Carpet Service?</h2>
             <ul className="mt-6 flex flex-col gap-4 text-body">
@@ -92,19 +92,21 @@ export default function ServicePageLayout({
               ))}
             </ul>
           </div>
-          <div className="rounded-xs bg-box-grey p-8">
-            <h2 className="font-heading text-2xl">Our Process</h2>
-            <ol className="mt-6 flex flex-col gap-4 text-body">
-              {OUR_PROCESS.map((item, i) => (
-                <li key={item.title}>
-                  <span className="font-semibold text-heading">
-                    {i + 1}. {item.title}
-                  </span>{" "}
-                  – {item.text}
-                </li>
-              ))}
-            </ol>
-          </div>
+          {hasSteps && (
+            <div className="rounded-xs bg-box-grey p-8">
+              <h2 className="font-heading text-2xl">Our Process</h2>
+              <ol className="mt-6 flex flex-col gap-4 text-body">
+                {steps.map((step, i) => (
+                  <li key={`${i}-${step.title}`}>
+                    <span className="font-semibold text-heading">
+                      {i + 1}. {step.title}
+                    </span>{" "}
+                    – {step.description}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </Container>
       </section>
 

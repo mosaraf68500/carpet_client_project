@@ -18,8 +18,8 @@ export async function generateMetadata({ params }) {
   const post = getPostBySlug(slug);
   if (!post) return {};
   return buildMetadata({
-    title: `${post.title} | Doha Furniture أثاث الدوحة`,
-    description: post.excerpt || `${post.title} — from the Doha Furniture أثاث الدوحة blog.`,
+    title: `${post.title} | Doha Carpet سجاد الدوحة`,
+    description: post.excerpt || `${post.title} — from the Doha Carpet سجاد الدوحة blog.`,
     path: post.href,
     image: post.image,
   });

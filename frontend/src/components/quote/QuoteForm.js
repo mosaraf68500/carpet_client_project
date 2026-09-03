@@ -53,13 +53,16 @@ export default function QuoteForm({ productOptions = [], initialProduct = "" }) 
       productText && !matchedProduct ? `Product of interest: ${productText}\n\n${message}` : message;
 
     try {
-      await submitContact({
-        name,
-        phone,
-        email,
-        message: finalMessage,
-        ...(matchedProduct ? { productId: matchedProduct.id } : {}),
-      });
+      await submitContact(
+        {
+          name,
+          phone,
+          email,
+          message: finalMessage,
+          ...(matchedProduct ? { productId: matchedProduct.id } : {}),
+        },
+        "quote"
+      );
       setStatus("success");
     } catch {
       // Deliberately don't reset the form on failure — the user's typed

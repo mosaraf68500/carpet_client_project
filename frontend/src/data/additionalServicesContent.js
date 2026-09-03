@@ -25,13 +25,13 @@ export const additionalServices = [
   },
   {
     title: "Carpet Supply and Installation",
-    text: "Carpets bring warmth, comfort, and luxury to your floors. At Doha Furniture Market, we supply a wide variety of carpets in different styles, colors, and textures. Our expert team ensures precise measurement and professional installation, giving your floors a flawless finish. Whether for homes, offices, or majlis, our carpets add elegance and durability to every environment.",
+    text: "Carpets bring warmth, comfort, and luxury to your floors. At Doha Carpet, we supply a wide variety of carpets in different styles, colors, and textures. Our expert team ensures precise measurement and professional installation, giving your floors a flawless finish. Whether for homes, offices, or majlis, our carpets add elegance and durability to every environment.",
     image: "https://images.unsplash.com/photo-1600166898405-da9535204843?w=1200&q=80",
     alt: "A hand-knotted carpet being unrolled and laid out, showing its fringe and weave",
   },
   {
     title: "Wallpaper Installation",
-    text: "Walls define the mood of a room, and wallpapers are the perfect way to add personality. We supply and install a wide range of wallpapers—modern, classic, textured, and patterned. Our professional installation guarantees a smooth, wrinkle-free finish that lasts. With Doha Furniture Market, your walls will become a statement piece, adding charm and sophistication to your interiors.",
+    text: "Walls define the mood of a room, and wallpapers are the perfect way to add personality. We supply and install a wide range of wallpapers—modern, classic, textured, and patterned. Our professional installation guarantees a smooth, wrinkle-free finish that lasts. With Doha Carpet, your walls will become a statement piece, adding charm and sophistication to your interiors.",
     image: "https://images.unsplash.com/photo-1628070852047-dc2ea1da3ffd?w=1200&q=80",
     alt: "An elegant gold floral damask wallpaper pattern on a wall",
   },

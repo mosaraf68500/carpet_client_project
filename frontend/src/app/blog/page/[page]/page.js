@@ -19,8 +19,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { page } = await params;
   return buildMetadata({
-    title: `Blog – Page ${page} | Doha Furniture أثاث الدوحة`,
-    description: "More stories from the Doha Furniture أثاث الدوحة blog.",
+    title: `Blog – Page ${page} | Doha Carpet سجاد الدوحة`,
+    description: "More stories from the Doha Carpet سجاد الدوحة blog.",
     path: `/blog/page/${page}/`,
   });
 }

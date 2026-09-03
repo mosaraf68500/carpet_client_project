@@ -29,8 +29,8 @@ export async function generateMetadata({ params }) {
   const category = getCategory(slug);
   if (!category) return {};
   return buildMetadata({
-    title: `${category} | Doha Furniture أثاث الدوحة Blog`,
-    description: `Posts filed under ${category} on the Doha Furniture أثاث الدوحة blog.`,
+    title: `${category} | Doha Carpet سجاد الدوحة Blog`,
+    description: `Posts filed under ${category} on the Doha Carpet سجاد الدوحة blog.`,
     path: `/category/${slug}/`,
   });
 }

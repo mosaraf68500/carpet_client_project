@@ -18,4 +18,10 @@ export const appointmentForm = {
   messageLabel: "What are you looking for? (optional)",
   submitLabel: "Request appointment",
   successMessage: "Thanks — we've received your request and will confirm a time shortly.",
+  errorMessage:
+    "Something went wrong — please try WhatsApp or Call instead, or try sending this again in a moment.",
+  nameRequiredError: "Please enter your name.",
+  contactRequiredError: "Please enter a phone number or email.",
+  dateRequiredError: "Please choose a preferred date.",
+  datePastError: "Please choose a date that isn't in the past.",
 };

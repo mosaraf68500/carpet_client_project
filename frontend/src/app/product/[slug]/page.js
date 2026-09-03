@@ -26,10 +26,10 @@ export async function generateMetadata({ params }) {
     return {};
   }
   return buildMetadata({
-    title: `${product.title} | Doha Furniture أثاث الدوحة`,
+    title: `${product.title} | Doha Carpet سجاد الدوحة`,
     description:
       product.description ||
-      `${product.title} — a handcrafted piece from Doha Furniture أثاث الدوحة's carpet and rug collection.`,
+      `${product.title} — a handcrafted piece from Doha Carpet سجاد الدوحة's carpet and rug collection.`,
     path: `/product/${product.slug}/`,
     image: product.images?.[0]?.url,
   });

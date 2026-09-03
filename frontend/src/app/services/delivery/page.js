@@ -45,6 +45,7 @@ export default async function DeliveryServicePage() {
       contentImage={service?.contentImage?.url || FALLBACK_IMAGE}
       contentImageAlt={service?.contentTitle || title}
       slideImages={(service?.slideImages || []).map((img) => img.url)}
+      steps={service?.steps || []}
     />
   );
 }

@@ -10,9 +10,9 @@ import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 // the Doha showroom location + map — see data/aboutContent.js for the
 // transcription source/notes.
 export const metadata = buildMetadata({
-  title: "Our Story | Doha Furniture أثاث الدوحة",
+  title: "Our Story | Doha Carpet سجاد الدوحة",
   description:
-    "Doha Furniture أثاث الدوحة sources and creates handmade carpets, kilims, and textiles — antique finds and masterful recreations, curated by our specialists.",
+    "Doha Carpet سجاد الدوحة sources and creates handmade carpets, kilims, and textiles — antique finds and masterful recreations, curated by our specialists.",
   path: "/about/",
 });
 

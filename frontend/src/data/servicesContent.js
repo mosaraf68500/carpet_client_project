@@ -15,7 +15,7 @@ export const services = {
     slug: "installation",
     name: "Installation",
     breadcrumbLabel: "Installation",
-    metaTitle: "Carpet Installation Services | Doha Furniture أثاث الدوحة",
+    metaTitle: "Carpet Installation Services | Doha Carpet سجاد الدوحة",
     metaDescription:
       "Professional measuring, delivery and fitting for hand-knotted carpets and rugs — book carpet installation with our specialists in Doha.",
     introHeading: "Getting your rug installed, done right",
@@ -57,7 +57,7 @@ export const services = {
     slug: "fixing",
     name: "Fixing",
     breadcrumbLabel: "Fixing",
-    metaTitle: "Carpet Repair & Restoration | Doha Furniture أثاث الدوحة",
+    metaTitle: "Carpet Repair & Restoration | Doha Carpet سجاد الدوحة",
     metaDescription:
       "Expert carpet and rug repair — edge re-binding, patching and re-weaving — from our restoration specialists in Doha.",
     introHeading: "Careful repair for carpets worth keeping",
@@ -99,9 +99,9 @@ export const services = {
     slug: "delivery",
     name: "Delivery",
     breadcrumbLabel: "Delivery",
-    metaTitle: "Carpet Delivery Service | Doha Furniture أثاث الدوحة",
+    metaTitle: "Carpet Delivery Service | Doha Carpet سجاد الدوحة",
     metaDescription:
-      "Careful, tracked delivery and in-home placement for every carpet and rug order from Doha Furniture أثاث الدوحة.",
+      "Careful, tracked delivery and in-home placement for every carpet and rug order from Doha Carpet سجاد الدوحة.",
     introHeading: "Careful delivery, from our workshop to your floor",
     introText:
       "A hand-knotted carpet takes months, sometimes years, to make — the last thing it needs is careless handling on the way to you. Every order is packaged, tracked and delivered with the same care that went into making it.",

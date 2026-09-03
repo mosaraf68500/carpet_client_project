@@ -7,9 +7,9 @@ import { blogTitleBar, blogPosts, blogPagination } from "@/data/blogContent";
 import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Blog | Doha Furniture أثاث الدوحة",
+  title: "Blog | Doha Carpet سجاد الدوحة",
   description:
-    "Stories, care advice, and inspiration from Doha Furniture أثاث الدوحة — the history and craft behind hand-knotted carpets from Persia, Morocco, Africa and beyond.",
+    "Stories, care advice, and inspiration from Doha Carpet سجاد الدوحة — the history and craft behind hand-knotted carpets from Persia, Morocco, Africa and beyond.",
   path: "/blog/",
 });
 

@@ -9,9 +9,9 @@ import { additionalServices } from "@/data/additionalServicesContent";
 import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Shop luxury carpets, kilims, shawls and more | Doha Furniture أثاث الدوحة",
+  title: "Shop luxury carpets, kilims, shawls and more | Doha Carpet سجاد الدوحة",
   description:
-    "Browse Doha Furniture أثاث الدوحة's carpet, kilim, and textile categories, and find your perfect handcrafted piece.",
+    "Browse Doha Carpet سجاد الدوحة's carpet, kilim, and textile categories, and find your perfect handcrafted piece.",
   path: "/shop/",
 });
 

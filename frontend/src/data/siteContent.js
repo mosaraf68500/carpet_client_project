@@ -2,9 +2,9 @@
 // with every "Carpet Cellar" / "carpetcellar" brand reference replaced per the rebrand.
 
 export const brand = {
-  name: "Doha Furniture أثاث الدوحة",
+  name: "Doha Carpet سجاد الدوحة",
   logo: "/images/Layer-1-720x56.png",
-  logoAlt: "Doha Furniture أثاث الدوحة",
+  logoAlt: "Doha Carpet سجاد الدوحة",
 };
 
 export const nav = {
@@ -20,9 +20,9 @@ export const nav = {
   ],
   // The "Shop" mega menu content below exists in the original markup but was hidden
   // site-wide on the live site via a `.old-menu{display:none}` rule in the source CSS.
-  // Rendered here as a real hover-dropdown (ShopDropdown) per product decision — these
-  // are also the single source of truth for the /product-category/ routes generated in
-  // data/productCategories.js, so the dropdown and the routes never drift apart.
+  // Rendered here as a real hover-dropdown (ShopDropdown) per product decision — the
+  // actual /product-category/[slug]/ route is dynamic and driven by the live backend
+  // category API, not by anything in this file.
   megaMenu: {
     columns: [
       // This column is the one entry from the old fake nested-category data
@@ -306,7 +306,7 @@ export const trustBadges = [
 ];
 
 export const blogSection = {
-  heading: "The Doha Furniture أثاث الدوحة Blog",
+  heading: "The Doha Carpet سجاد الدوحة Blog",
   description:
     "Delve into the magical world of hand-knotted carpets from the exotic regions of Persia, Morocco, Africa and more. Get inspiration, find care advice, and discover the stories behind the art.",
   posts: [
@@ -337,7 +337,7 @@ export const instagramFeed = {
   // replaced with the site name per the client's correction, still linking
   // to the real Instagram profile below.
   handles: [
-    { label: "Doha Furniture أثاث الدوحة", href: "https://www.instagram.com/unique_carpet_doha?utm_source=qr" },
+    { label: "Doha Carpet سجاد الدوحة", href: "https://www.instagram.com/unique_carpet_doha?utm_source=qr" },
   ],
   profile: {
     username: "unique_carpet_doha",
@@ -370,7 +370,7 @@ export const instagramFeed = {
 };
 
 export const aboutSection = {
-  heading: "About Doha Furniture أثاث الدوحة",
+  heading: "About Doha Carpet سجاد الدوحة",
   intro:
     "How does one fill a space with that indefinable feeling of home, of warmth and sanctuary, of higher living and thoughtful appreciation of the finer things in life?",
   introContinued: "The answer is simple: through careful curation of art that sparks joy.",
@@ -425,7 +425,7 @@ export const aboutSection = {
     },
     {
       heading: "Sustainability and ethics",
-      text: "At Doha Furniture أثاث الدوحة, you'll find a delicate blend of history, craftsmanship, and exclusivity, all woven into gorgeous pieces of floor art. Browse through our listings of carpets online to choose something that suits your tastes, or let our experts help you find the perfect piece.",
+      text: "At Doha Carpet سجاد الدوحة, you'll find a delicate blend of history, craftsmanship, and exclusivity, all woven into gorgeous pieces of floor art. Browse through our listings of carpets online to choose something that suits your tastes, or let our experts help you find the perfect piece.",
     },
   ],
 };

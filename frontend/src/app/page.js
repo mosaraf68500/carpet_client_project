@@ -8,9 +8,9 @@ import PressLogos from "@/components/home/PressLogos";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Luxury handmade carpets online | Doha Furniture أثاث الدوحة",
+  title: "Luxury handmade carpets online | Doha Carpet سجاد الدوحة",
   description:
-    "Shop Doha Furniture أثاث الدوحة's kilims and rugs online, handmade using traditional techniques and premium materials. Find modern, classic and transitional carpets online.",
+    "Shop Doha Carpet سجاد الدوحة's kilims and rugs online, handmade using traditional techniques and premium materials. Find modern, classic and transitional carpets online.",
   path: "/",
 });
 
@@ -29,7 +29,7 @@ export default function Home() {
           site-title text) — this reproduces that same pattern instead of
           promoting the hero copy to <h1>, while still giving the page exactly
           one real <h1> for SEO/a11y. */}
-      <h1 className="sr-only">Doha Furniture أثاث الدوحة — Luxury Handmade Carpets Online</h1>
+      <h1 className="sr-only">Doha Carpet سجاد الدوحة — Luxury Handmade Carpets Online</h1>
       <Hero />
       <BestsellingCollections />
       <ProductSpotlight />

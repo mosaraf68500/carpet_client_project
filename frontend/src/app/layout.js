@@ -47,11 +47,11 @@ const jost = Jost({
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Luxury handmade carpets online | Doha Furniture أثاث الدوحة",
+    default: "Luxury handmade carpets online | Doha Carpet سجاد الدوحة",
     template: "%s",
   },
   description:
-    "Shop Doha Furniture أثاث الدوحة's kilims and rugs online, handmade using traditional techniques and premium materials. Find modern, classic and transitional carpets online.",
+    "Shop Doha Carpet سجاد الدوحة's kilims and rugs online, handmade using traditional techniques and premium materials. Find modern, classic and transitional carpets online.",
 };
 
 export default function RootLayout({ children }) {
