@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createCategory, updateCategory } from "@/lib/api";
+import { createCategory, updateCategory, getCategories } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/StatusState";
 
@@ -9,10 +9,41 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
   const isEditing = Boolean(existingCategory);
 
   const [name, setName] = useState(existingCategory?.name || "");
+  // The list endpoint returns parentCategory as a raw id string; a single
+  // category (GET /categories/:slug) returns it populated as {_id, name,
+  // slug}. Handle both shapes defensively.
+  const [parentCategoryId, setParentCategoryId] = useState(
+    existingCategory?.parentCategory?._id || existingCategory?.parentCategory || ""
+  );
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const [parentOptions, setParentOptions] = useState([]);
+  const [parentOptionsStatus, setParentOptionsStatus] = useState("loading"); // loading | ready | error
+
+  // Only top-level categories (parentCategory null) are valid parent
+  // choices — mirrors the backend's 2-level constraint so the dropdown
+  // never offers an option the API would reject. Also excludes this
+  // category itself when editing (can't be its own parent).
+  useEffect(() => {
+    let cancelled = false;
+    getCategories().then(
+      (result) => {
+        if (cancelled) return;
+        setParentOptions(result.filter((c) => !c.parentCategory && c._id !== existingCategory?._id));
+        setParentOptionsStatus("ready");
+      },
+      () => {
+        if (cancelled) return;
+        setParentOptionsStatus("error");
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [existingCategory?._id]);
 
   // Cleanup only — no setState here, so this isn't a "derive state from an
   // effect" pattern. The URL itself is created in the file-input's change
@@ -36,6 +67,7 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
 
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("parentCategory", parentCategoryId);
     if (imageFile) {
       formData.append("image", imageFile);
     }
@@ -71,7 +103,7 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
         </div>
       )}
 
-      <div className="flex flex-col gap-1 md:col-span-2">
+      <div className="flex flex-col gap-1">
         <label htmlFor="category_name" className="text-sm">
           Name
         </label>
@@ -83,6 +115,29 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
           onChange={(e) => setName(e.target.value)}
           className="w-full border border-border-form px-3 py-2 focus:border-black focus:outline-none"
         />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="category_parent" className="text-sm">
+          Parent Category
+        </label>
+        {parentOptionsStatus === "error" && (
+          <p className="text-sm text-primary-text">Failed to load parent categories. Try reloading the page.</p>
+        )}
+        <select
+          id="category_parent"
+          value={parentCategoryId}
+          onChange={(e) => setParentCategoryId(e.target.value)}
+          disabled={parentOptionsStatus !== "ready"}
+          className="w-full border border-border-form px-3 py-2 focus:border-black focus:outline-none disabled:bg-box-grey"
+        >
+          <option value="">{parentOptionsStatus === "loading" ? "Loading…" : "None — top level"}</option>
+          {parentOptions.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-col gap-2 md:col-span-2">

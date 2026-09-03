@@ -1,9 +1,11 @@
 import PageTitleBar from "@/components/common/PageTitleBar";
-import ShopCategoryGrid from "@/components/shop/ShopCategoryGrid";
+import CategoryGrid from "@/components/home/CategoryGrid";
+import AdditionalServices from "@/components/shop/AdditionalServices";
 import Container from "@/components/common/Container";
 import JsonLd from "@/components/common/JsonLd";
+import { getCategories } from "@/lib/api";
 import { shopTitleBar } from "@/data/shopContent";
-import { bestsellingCollections } from "@/data/siteContent";
+import { additionalServices } from "@/data/additionalServicesContent";
 import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -13,23 +15,41 @@ export const metadata = buildMetadata({
   path: "/shop/",
 });
 
-// Same category set BestsellingCollections uses for its main (non-featured)
-// grid on the homepage — the only categories in the data that carry both a
-// real /product-category/ route and a real image. See shop/page.js's report
-// note for why this was chosen over the filter sidebar's category tree
-// (no images) and the full flattened productCategories list (only 6 of ~21
-// entries have images, and most are sub-category granularity, not the
-// top-level collections a landing grid should show).
-const shopCategories = bestsellingCollections.categories.filter((c) => !c.featured);
+// Real Category shape from the API is { _id, name, slug, image: { url,
+// publicId }, createdAt, updatedAt } — no `description` field at all, and
+// `image` is an object, not a bare string. CategoryCard (component) expects
+// { name, image (string), href, description }, so this adapts the data at
+// the page level rather than changing the shared component. Falls back to
+// the same Unsplash photo already used as the /product-category hero
+// fallback when a category has no image — the closest existing
+// "placeholder image" convention in the project (searched first; the only
+// other candidate, instagram-placeholder.png, is square-cropped for feed
+// posts and no longer even referenced anywhere after an earlier pass).
+const FALLBACK_CATEGORY_IMAGE = "https://images.unsplash.com/photo-1600166898405-da9535204843?w=1200&q=80";
 
-export default function ShopPage() {
+function toCategoryCardProps(category) {
+  return {
+    name: category.name,
+    image: category.image?.url || FALLBACK_CATEGORY_IMAGE,
+    href: `/product-category/${category.slug}/`,
+    description: undefined,
+  };
+}
+
+export default async function ShopPage() {
+  // Top-level only — this is the landing page, subcategories would just
+  // clutter it (they're reachable by clicking through to their parent).
+  const categories = await getCategories({ parent: "root" });
+  const shopCategories = categories.map(toCategoryCardProps);
+
   return (
     <>
       <JsonLd data={breadcrumbJsonLd(shopTitleBar.breadcrumb)} />
       <PageTitleBar heading={shopTitleBar.heading} breadcrumb={shopTitleBar.breadcrumb} />
       <Container size="boxed" className="py-14">
-        <ShopCategoryGrid categories={shopCategories} />
+        <CategoryGrid categories={shopCategories} columns={3} />
       </Container>
+      <AdditionalServices services={additionalServices} />
     </>
   );
 }

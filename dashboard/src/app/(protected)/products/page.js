@@ -9,6 +9,14 @@ import { LoadingState, ErrorState, EmptyState } from "@/components/ui/StatusStat
 
 const PAGE_SIZE = 10;
 
+// Short labels for the table's "Section" badge — full names ("Our
+// Bestselling Collections") are too wide for a compact table cell.
+const HOMEPAGE_SECTION_LABELS = {
+  bestselling: "Bestselling",
+  curated: "Curated",
+  spotlight: "Spotlight",
+};
+
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
@@ -132,6 +140,7 @@ export default function ProductsPage() {
                   <th className="px-4 py-3 font-medium">Image</th>
                   <th className="px-4 py-3 font-medium">Title</th>
                   <th className="px-4 py-3 font-medium">Category</th>
+                  <th className="px-4 py-3 font-medium">Section</th>
                   <th className="px-4 py-3 font-medium">Sizes</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Actions</th>
@@ -150,6 +159,15 @@ export default function ProductsPage() {
                     </td>
                     <td className="px-4 py-3 font-medium text-heading">{product.title}</td>
                     <td className="px-4 py-3 text-body">{product.category?.name || "—"}</td>
+                    <td className="px-4 py-3">
+                      {product.homepageSection ? (
+                        <span className="inline-block rounded-xs bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                          {HOMEPAGE_SECTION_LABELS[product.homepageSection] || product.homepageSection}
+                        </span>
+                      ) : (
+                        <span className="text-body">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-body">
                       {product.sizes?.length || 0} size{product.sizes?.length === 1 ? "" : "s"}
                     </td>

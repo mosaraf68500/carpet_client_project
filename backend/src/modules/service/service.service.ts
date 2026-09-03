@@ -12,11 +12,15 @@ import type { CreateServiceBody, UpdateServiceBody } from "./service.types.js";
 // testable independently of Express.
 
 export interface CreateServiceInput extends CreateServiceBody {
-  file?: Express.Multer.File;
+  image?: Express.Multer.File;
+  contentImage?: Express.Multer.File;
+  slideImages?: Express.Multer.File[];
 }
 
 export interface UpdateServiceInput extends UpdateServiceBody {
-  file?: Express.Multer.File;
+  image?: Express.Multer.File;
+  contentImage?: Express.Multer.File;
+  slideImages?: Express.Multer.File[];
 }
 
 export async function getServices(): Promise<IService[]> {
@@ -36,7 +40,7 @@ export async function getAllServicesForAdmin(): Promise<IService[]> {
 }
 
 export async function createService(data: CreateServiceInput): Promise<IService> {
-  const { title, intro, steps, file } = data;
+  const { title, intro, steps, contentTitle, image, contentImage, slideImages } = data;
 
   if (!title) {
     throw new HttpError("Title is required", 400);
@@ -48,16 +52,26 @@ export async function createService(data: CreateServiceInput): Promise<IService>
     throw new HttpError("A service with this title already exists", 400);
   }
 
-  const image: IServiceImage | undefined = file
-    ? { url: file.path, publicId: file.filename }
+  const heroImage: IServiceImage | undefined = image
+    ? { url: image.path, publicId: image.filename }
     : undefined;
+  const sectionImage: IServiceImage | undefined = contentImage
+    ? { url: contentImage.path, publicId: contentImage.filename }
+    : undefined;
+  const slides: IServiceImage[] = (slideImages ?? []).map((f) => ({
+    url: f.path,
+    publicId: f.filename,
+  }));
 
   return ServiceModel.create({
     title,
     slug,
     intro,
     steps: steps ? (JSON.parse(steps) as IStep[]) : [],
-    image,
+    image: heroImage,
+    contentTitle,
+    contentImage: sectionImage,
+    slideImages: slides,
   });
 }
 
@@ -67,7 +81,8 @@ export async function updateService(id: string, data: UpdateServiceInput): Promi
     throw new HttpError("Service not found", 404);
   }
 
-  const { title, intro, steps, isActive, file } = data;
+  const { title, intro, steps, isActive, contentTitle, image, contentImage, slideImages, removeSlideImagePublicIds } =
+    data;
 
   if (title) {
     service.title = title;
@@ -75,13 +90,36 @@ export async function updateService(id: string, data: UpdateServiceInput): Promi
   }
   if (intro !== undefined) service.intro = intro;
   if (steps) service.steps = JSON.parse(steps) as IStep[];
+  if (contentTitle !== undefined) service.contentTitle = contentTitle;
   if (isActive !== undefined) service.isActive = isActive === "true" || isActive === true;
 
-  if (file) {
+  if (image) {
     if (service.image?.publicId) {
       await cloudinary.uploader.destroy(service.image.publicId).catch(() => {});
     }
-    service.image = { url: file.path, publicId: file.filename };
+    service.image = { url: image.path, publicId: image.filename };
+  }
+
+  if (contentImage) {
+    if (service.contentImage?.publicId) {
+      await cloudinary.uploader.destroy(service.contentImage.publicId).catch(() => {});
+    }
+    service.contentImage = { url: contentImage.path, publicId: contentImage.filename };
+  }
+
+  // slideImages is a growing collection, not one replaceable photo — remove
+  // selected existing slides, then append newly uploaded ones, same pattern
+  // as product.service.ts's images/removeImagePublicIds handling.
+  if (removeSlideImagePublicIds) {
+    const idsToRemove: string[] = JSON.parse(removeSlideImagePublicIds);
+    for (const publicId of idsToRemove) {
+      await cloudinary.uploader.destroy(publicId).catch(() => {});
+    }
+    service.slideImages = service.slideImages.filter((img) => !idsToRemove.includes(img.publicId));
+  }
+  if (slideImages?.length) {
+    const newSlides: IServiceImage[] = slideImages.map((f) => ({ url: f.path, publicId: f.filename }));
+    service.slideImages.push(...newSlides);
   }
 
   await service.save();
@@ -96,6 +134,14 @@ export async function deleteService(id: string): Promise<void> {
 
   if (service.image?.publicId) {
     await cloudinary.uploader.destroy(service.image.publicId).catch(() => {});
+  }
+  if (service.contentImage?.publicId) {
+    await cloudinary.uploader.destroy(service.contentImage.publicId).catch(() => {});
+  }
+  for (const slide of service.slideImages) {
+    if (slide.publicId) {
+      await cloudinary.uploader.destroy(slide.publicId).catch(() => {});
+    }
   }
 
   await service.deleteOne();

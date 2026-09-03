@@ -20,6 +20,7 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
   const [title, setTitle] = useState(existingProduct?.title || "");
   const [description, setDescription] = useState(existingProduct?.description || "");
   const [category, setCategory] = useState(existingProduct?.category?._id || "");
+  const [homepageSection, setHomepageSection] = useState(existingProduct?.homepageSection || "");
   const [sizes, setSizes] = useState(toSizeRows(existingProduct?.sizes));
   const [isActive, setIsActive] = useState(existingProduct?.isActive ?? true);
 
@@ -106,6 +107,7 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
     formData.append("description", description);
     formData.append("category", category);
     formData.append("sizes", JSON.stringify(cleanSizes));
+    formData.append("homepageSection", homepageSection);
 
     if (isEditing) {
       formData.append("isActive", String(isActive));
@@ -187,6 +189,23 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
               {cat.name}
             </option>
           ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="product_homepage_section" className="text-sm">
+          Homepage Section
+        </label>
+        <select
+          id="product_homepage_section"
+          value={homepageSection}
+          onChange={(e) => setHomepageSection(e.target.value)}
+          className="w-full border border-border-form px-3 py-2 focus:border-black focus:outline-none"
+        >
+          <option value="">None</option>
+          <option value="bestselling">Our Bestselling Collections</option>
+          <option value="curated">World&apos;s Finest Curated Treasures</option>
+          <option value="spotlight">Product Spotlight</option>
         </select>
       </div>
 

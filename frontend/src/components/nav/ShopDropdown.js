@@ -1,17 +1,19 @@
 "use client";
 
 // Same hover-dropdown pattern, panel styling, and sizing as ServicesDropdown
-// — a plain vertical text-link list, same background/padding/spacing/hover
-// state, same centered-under-trigger positioning. The only real differences
-// from ServicesDropdown: the trigger is a real link to /shop (a working
-// "all products" page, not just a dropdown toggle — clicking it must always
-// navigate there, hover/focus is what opens the panel), and its links come
-// from nav.megaMenu.columns (top-level categories) instead of the
-// hardcoded services list.
+// — a plain vertical list, same background/padding/spacing/hover state,
+// same centered-under-trigger positioning. The only real differences from
+// ServicesDropdown: the trigger is a real link to /shop (a working "all
+// products" page, not just a dropdown toggle — clicking it must always
+// navigate there, hover/focus is what opens the panel), and its content is
+// now a real category tree (top-level categories as headings, their
+// subcategories as indented links beneath) fetched by the parent Server
+// Component (Navbar) and passed down as `tree`, instead of the old flat
+// hardcoded nav.megaMenu.columns list.
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-export default function ShopDropdown({ label, href, links }) {
+export default function ShopDropdown({ label, href, tree }) {
   const [open, setOpen] = useState(false);
   const closeTimeout = useRef(null);
 
@@ -53,15 +55,30 @@ export default function ShopDropdown({ label, href, links }) {
           open ? "flex" : "hidden"
         }`}
       >
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            role="menuitem"
-            className="text-sm text-black hover:text-primary"
-          >
-            {link.label}
-          </Link>
+        {tree.map((top) => (
+          <div key={top._id}>
+            <Link
+              href={`/product-category/${top.slug}/`}
+              role="menuitem"
+              className="text-sm font-semibold text-black hover:text-primary"
+            >
+              {top.name}
+            </Link>
+            {top.children.length > 0 && (
+              <div className="mt-2 flex flex-col gap-2 pl-3">
+                {top.children.map((child) => (
+                  <Link
+                    key={child._id}
+                    href={`/product-category/${child.slug}/`}
+                    role="menuitem"
+                    className="text-sm text-black/70 hover:text-primary"
+                  >
+                    {child.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>

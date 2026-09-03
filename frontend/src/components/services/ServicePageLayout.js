@@ -1,88 +1,125 @@
 import Image from "next/image";
 import Container from "@/components/common/Container";
-import Button from "@/components/common/Button";
-import PageTitleBar from "@/components/common/PageTitleBar";
+import ServiceSlideGallery from "./ServiceSlideGallery";
 
-// Shared structure for the 3 /services/[slug] pages: standard title bar,
-// centered intro blurb, a full-bleed hero image with an overlapping caption
-// card, 4 alternating image/text rows, then a CTA banner. Each page just
-// passes in its own `service` object from data/servicesContent.js — nothing
-// here is service-specific, so the 3 pages stay visually identical and only
-// the content differs.
-export default function ServicePageLayout({ service }) {
-  const breadcrumb = [
-    { label: "Home", href: "/" },
-    { label: "Services", href: null },
-    { label: service.breadcrumbLabel, href: null },
-  ];
+// Generic trust-building copy, intentionally identical on all 3 service
+// pages (installation/fixing/delivery) rather than dashboard-controlled —
+// matches the reference design's "Why choose us" / "Our process" / "Our
+// promise" sections, which the client asked to keep the same everywhere.
+// Lightly reworded from the reference (which was written for the
+// Installation page specifically — "Professional Installation" as a list
+// item, "Installation" as process step 3) so the same copy reads sensibly
+// on Fixing/Delivery too; the brand name in the reference ("Doha Furniture
+// Market") was also corrected to this site's real name.
+const WHY_CHOOSE_US = [
+  { title: "Wide Variety of Designs & Colors", text: "Choose from modern, classic, and cultural patterns." },
+  { title: "Premium Quality Materials", text: "Long-lasting carpets that resist wear and tear." },
+  { title: "Professional Craftsmanship", text: "A skilled team ensures excellent results every time." },
+  { title: "Comfort & Elegance", text: "Soft underfoot feel with stylish appeal." },
+  { title: "Affordable Pricing", text: "Luxury carpets and service at competitive rates." },
+];
+
+const OUR_PROCESS = [
+  { title: "Consultation & Selection", text: "We help you choose the right option for your space." },
+  { title: "Measurement & Planning", text: "Accurate sizing and scheduling for a perfect fit." },
+  { title: "Careful Execution", text: "Our professional team ensures a smooth, precise result." },
+  { title: "Finishing Touches", text: "A clean, polished look that enhances your interiors." },
+];
+
+const OUR_PROMISE =
+  "At Doha Furniture أثاث الدوحة, we don't just sell carpets — we create comfort and elegance for your lifestyle. With our expert care, every carpet will look perfect from day one and stay beautiful for years to come.";
+
+// Shared structure for the 3 /services/[slug] pages, 5 sections:
+// 1. Hero image with the service name overlaid.
+// 2. Section title + description + a related photo, side by side —
+//    dashboard-controlled (contentTitle/intro/contentImage).
+// 3. "Why choose us" / "Our process" — static, same on every service page.
+// 4. A slideshow gallery (dashboard-controlled, slideImages) — only
+//    rendered when at least one slide image exists.
+// 5. "Our promise" — static, same on every service page.
+// Section 2 only renders when there's real contentTitle/intro text — a
+// permanent nav-linked route with no DB record yet (see the 3 page.js
+// files' fallback handling) shouldn't show an empty title+description box.
+export default function ServicePageLayout({
+  title,
+  heroImage,
+  heroAlt,
+  contentTitle,
+  intro,
+  contentImage,
+  contentImageAlt,
+  slideImages = [],
+}) {
+  const hasContentSection = Boolean(contentTitle || intro);
 
   return (
     <>
-      <PageTitleBar heading={service.name} breadcrumb={breadcrumb} />
-
-      <Container as="section" size="boxed" className="pt-16 pb-10 text-center">
-        <div className="mx-auto max-w-182.5">
-          <h2 className="font-heading text-2xl sm:text-3xl">{service.introHeading}</h2>
-          <p className="mt-4 text-body">{service.introText}</p>
-        </div>
-      </Container>
-
-      <section className="relative">
-        <div className="relative h-125 w-full overflow-hidden">
-          <Image
-            src={service.heroImage}
-            alt={service.heroAlt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
-        <div className="relative z-10 mx-auto -mt-14 w-[90%] max-w-xl bg-cream px-8 py-6 text-center shadow-lg sm:-mt-16">
-          <h3 className="font-heading text-xl sm:text-2xl">{service.heroCaption}</h3>
-        </div>
-      </section>
-
-      <div className="pt-10">
-        {service.rows.map((row, i) => {
-          const imageRight = i % 2 === 0;
-          return (
-            <div key={row.title} className="grid grid-cols-1 lg:grid-cols-2">
-              <div
-                className={`flex items-center px-6 py-12 sm:px-12 lg:px-16 lg:py-16 ${
-                  imageRight ? "lg:order-1" : "lg:order-2"
-                }`}
-              >
-                <div className="max-w-125">
-                  <h3 className="font-heading text-2xl">{row.title}</h3>
-                  <p className="mt-4 text-body">{row.text}</p>
-                </div>
-              </div>
-              <div
-                className={`relative h-80 lg:h-auto ${imageRight ? "lg:order-2" : "lg:order-1"}`}
-              >
-                <Image
-                  src={row.image}
-                  alt={row.alt}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          );
-        })}
+      <div className="relative flex h-75 w-full items-center justify-center overflow-hidden sm:h-125">
+        <Image src={heroImage} alt={heroAlt} fill priority sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-black/30" />
+        <h1 className="relative px-4 text-center font-heading text-3xl text-white sm:text-4xl">{title}</h1>
       </div>
 
-      <section className="bg-cream py-16 text-center">
-        <Container size="boxed">
-          <h2 className="font-heading text-2xl sm:text-3xl">{service.ctaHeading}</h2>
-          <p className="mx-auto mt-3 max-w-md text-body">{service.ctaText}</p>
-          <Button href="/quote/" variant="outline-dark" className="mt-8">
-            Get a Free Quote
-          </Button>
+      {hasContentSection && (
+        <Container as="section" size="boxed" className="py-16">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+            <div>
+              {contentTitle && <h2 className="font-heading text-3xl sm:text-4xl">{contentTitle}</h2>}
+              {intro && <p className="mt-6 whitespace-pre-line text-body">{intro}</p>}
+            </div>
+            <div className="relative aspect-4/3 overflow-hidden rounded-xs">
+              <Image
+                src={contentImage}
+                alt={contentImageAlt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </Container>
+      )}
+
+      <section className="border-y border-border py-16">
+        <Container size="boxed" className="grid grid-cols-1 gap-10 md:grid-cols-2">
+          <div className="rounded-xs bg-box-grey p-8">
+            <h2 className="font-heading text-2xl">Why Choose Our Carpet Service?</h2>
+            <ul className="mt-6 flex flex-col gap-4 text-body">
+              {WHY_CHOOSE_US.map((item) => (
+                <li key={item.title}>
+                  <span className="font-semibold text-heading">{item.title}</span> – {item.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xs bg-box-grey p-8">
+            <h2 className="font-heading text-2xl">Our Process</h2>
+            <ol className="mt-6 flex flex-col gap-4 text-body">
+              {OUR_PROCESS.map((item, i) => (
+                <li key={item.title}>
+                  <span className="font-semibold text-heading">
+                    {i + 1}. {item.title}
+                  </span>{" "}
+                  – {item.text}
+                </li>
+              ))}
+            </ol>
+          </div>
         </Container>
       </section>
+
+      {slideImages.length > 0 && (
+        <Container as="section" size="boxed" className="py-16">
+          <ServiceSlideGallery images={slideImages} />
+        </Container>
+      )}
+
+      <Container size="boxed" className="py-16">
+        <div className="rounded-xs bg-box-grey p-8">
+          <h2 className="font-heading text-xl">Our Promise</h2>
+          <p className="mt-3 text-body">{OUR_PROMISE}</p>
+        </div>
+      </Container>
     </>
   );
 }

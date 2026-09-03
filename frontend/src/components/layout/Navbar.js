@@ -6,14 +6,7 @@ import SearchField from "@/components/nav/SearchField";
 import { MobileMenuToggle } from "@/components/nav/NavControls";
 import ServicesDropdown from "@/components/nav/ServicesDropdown";
 import ShopDropdown from "@/components/nav/ShopDropdown";
-
-// Same flat-list shape as nav.megaMenu.services.links — the Shop dropdown is
-// visually identical to the Services one, so it only gets top-level category
-// names (Carpets, Kilims, ...), not every sub-category.
-const shopCategoryLinks = nav.megaMenu.columns.map((column) => ({
-  label: column.heading,
-  href: column.href,
-}));
+import { getCategories, buildCategoryTree } from "@/lib/api";
 
 // Server Component, single-row layout: logo (left) / search (middle,
 // desktop only) / nav links (right, desktop only). Only the hover-dropdowns
@@ -21,7 +14,15 @@ const shopCategoryLinks = nav.megaMenu.columns.map((column) => ({
 // client components instead of making the whole Navbar client-side. On
 // mobile the search field and nav links move into MobileMenu's slide-in
 // panel — this bar collapses to just the hamburger and logo.
-export default function Navbar() {
+//
+// Async Server Component: fetches real categories here (not client-side in
+// ShopDropdown) and passes the built tree down as a prop. Replaces the old
+// hardcoded nav.megaMenu.columns flat list — nav.megaMenu.services is still
+// used below for the (unrelated) Services dropdown, untouched.
+export default async function Navbar() {
+  const categories = await getCategories();
+  const shopCategoryTree = buildCategoryTree(categories);
+
   return (
     <header className="sticky top-0 z-40 border-b border-cream-dark bg-cream">
       <Container size="header" className="flex items-center gap-4 py-4 lg:gap-6">
@@ -48,7 +49,7 @@ export default function Navbar() {
               if (item.hasMegaMenu) {
                 return (
                   <li key={item.href} className="relative">
-                    <ShopDropdown label={item.label} href={item.href} links={shopCategoryLinks} />
+                    <ShopDropdown label={item.label} href={item.href} tree={shopCategoryTree} />
                   </li>
                 );
               }

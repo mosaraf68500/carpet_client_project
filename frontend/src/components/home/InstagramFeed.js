@@ -34,7 +34,7 @@ export default function InstagramFeed() {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-4">
           {instagramFeed.posts.map((post, i) => (
             <a
               key={i}

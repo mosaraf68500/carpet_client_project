@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Button from "@/components/common/Button";
+import Container from "@/components/common/Container";
 import { heroSlides } from "@/data/siteContent";
 
 export default function Hero() {
   const [active, setActive] = useState(0);
+  const activeSlide = heroSlides[active];
 
   useEffect(() => {
     // Auto-rotating carousels are exactly the motion prefers-reduced-motion
@@ -46,22 +48,32 @@ export default function Hero() {
             className="block object-cover sm:hidden"
           />
           <div className="absolute inset-0 bg-black/20" />
-
-          <div className="relative flex h-full flex-col items-center justify-center px-6 text-center text-white">
-            <h3 className="font-display max-w-3xl text-4xl leading-tight text-white sm:text-6xl">
-              {slide.title}
-            </h3>
-            {slide.subtitle && (
-              <p className="mt-4 max-w-xl font-heading text-lg text-white sm:text-2xl">
-                {slide.subtitle}
-              </p>
-            )}
-            <Button href={slide.cta.href} variant="border" className="mt-8">
-              {slide.cta.label}
-            </Button>
-          </div>
         </div>
       ))}
+
+      {/* Text/button reflect only the active slide, in one block re-keyed
+          by `active` so the fade-up entrance replays on every slide
+          change (auto-rotate or a dot click), not just on first mount.
+          Wrapped in the same Container size="header" the Navbar uses for
+          its logo, so the left edge lines up exactly instead of using a
+          separate padding value that only coincidentally matched it. */}
+      <div className="relative flex h-full flex-col justify-center text-white">
+        <Container size="header" className="flex flex-col items-start text-left">
+          <div key={active} className="animate-hero-fade-up flex flex-col items-start">
+            <h3 className="font-display max-w-3xl text-4xl leading-tight text-white sm:text-6xl">
+              {activeSlide.title}
+            </h3>
+            {activeSlide.subtitle && (
+              <p className="mt-4 max-w-xl font-heading text-lg text-white sm:text-2xl">
+                {activeSlide.subtitle}
+              </p>
+            )}
+            <Button href={activeSlide.cta.href} variant="light" className="mt-8 normal-case!">
+              {activeSlide.cta.label}
+            </Button>
+          </div>
+        </Container>
+      </div>
 
       <div className="absolute inset-x-0 bottom-6 flex justify-center gap-2">
         {heroSlides.map((slide, i) => (

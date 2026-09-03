@@ -23,12 +23,32 @@ export interface UpdateProductInput extends UpdateProductBody {
   files?: Express.Multer.File[];
 }
 
+const HOMEPAGE_SECTIONS = ["bestselling", "curated", "spotlight"] as const;
+type HomepageSection = (typeof HOMEPAGE_SECTIONS)[number];
+
+// "" / "none" (what a dashboard select sends for its default option) both
+// normalize to null, same pattern as category.service.ts's
+// resolveParentCategory. Anything else must be one of the 3 known values —
+// validated explicitly here (rather than relying on the schema's own enum
+// to reject it) so a bad value 400s with a clear message instead of a
+// generic 500 from an uncaught Mongoose ValidationError.
+function resolveHomepageSection(value?: string): HomepageSection | null {
+  if (!value || value === "none") return null;
+  if (!HOMEPAGE_SECTIONS.includes(value as HomepageSection)) {
+    throw new HttpError("Invalid homepage section", 400);
+  }
+  return value as HomepageSection;
+}
+
 export async function getProducts(query: ProductQuery): Promise<PaginatedResult<IProduct>> {
-  const { category, unit, minSize, maxSize, page = "1", limit = "12" } = query;
+  const { category, unit, minSize, maxSize, homepageSection, page = "1", limit = "12" } = query;
 
   const pageNum = Math.max(1, Number(page));
   const limitNum = Math.max(1, Number(limit));
 
+  // Always isActive: true here regardless of what else is filtered — this
+  // is the public listing, and the homepage must never show an inactive
+  // product just because it happens to be tagged into a section.
   const filter: FilterQuery<IProduct> = { isActive: true };
 
   if (category) {
@@ -51,10 +71,19 @@ export async function getProducts(query: ProductQuery): Promise<PaginatedResult<
     filter.sizes = { $elemMatch: sizeMatch };
   }
 
+  if (homepageSection) {
+    filter.homepageSection = homepageSection;
+  }
+
+  // Homepage-section queries sort by most-recently-updated so tagging a
+  // product into a section (an update) predictably brings it to the front;
+  // the regular catalog listing keeps sorting by creation order.
+  const sort: Record<string, 1 | -1> = homepageSection ? { updatedAt: -1 } : { createdAt: -1 };
+
   const [items, total] = await Promise.all([
     Product.find(filter)
       .populate("category", "name slug")
-      .sort({ createdAt: -1 })
+      .sort(sort)
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum),
     Product.countDocuments(filter),
@@ -99,7 +128,7 @@ export async function getAllProductsForAdmin(
 }
 
 export async function createProduct(data: CreateProductInput): Promise<IProduct> {
-  const { title, description, category, sizes, files } = data;
+  const { title, description, category, sizes, homepageSection, files } = data;
 
   if (!title || !category) {
     throw new HttpError("Title and category are required", 400);
@@ -128,6 +157,7 @@ export async function createProduct(data: CreateProductInput): Promise<IProduct>
     category: category as unknown as mongoose.Types.ObjectId,
     sizes: sizes ? (JSON.parse(sizes) as ISize[]) : [],
     images,
+    homepageSection: resolveHomepageSection(homepageSection),
   });
 }
 
@@ -137,7 +167,8 @@ export async function updateProduct(id: string, data: UpdateProductInput): Promi
     throw new HttpError("Product not found", 404);
   }
 
-  const { title, description, category, sizes, isActive, removeImagePublicIds, files } = data;
+  const { title, description, category, sizes, isActive, removeImagePublicIds, homepageSection, files } =
+    data;
 
   if (title) {
     product.title = title;
@@ -147,6 +178,12 @@ export async function updateProduct(id: string, data: UpdateProductInput): Promi
   if (category) product.category = category as unknown as mongoose.Types.ObjectId;
   if (sizes) product.sizes = JSON.parse(sizes) as ISize[];
   if (isActive !== undefined) product.isActive = isActive === "true" || isActive === true;
+  // Distinguish "field not sent" (leave untouched) from "sent as empty
+  // string/none" (explicitly clear it back to unfeatured) — same pattern
+  // as category.service.ts's parentCategory handling.
+  if (homepageSection !== undefined) {
+    product.homepageSection = resolveHomepageSection(homepageSection);
+  }
 
   // remove selected existing images
   if (removeImagePublicIds) {

@@ -2,6 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/common/Container";
 import { blogSection } from "@/data/siteContent";
+import { blogPosts } from "@/data/blogContent";
+
+// Heading/description copy still comes from siteContent.js, but the posts
+// themselves are the real /blog data's first 3 entries (its display order,
+// same as /blog itself — most posts have no date field to sort by), linking
+// to their real /blog/[slug] pages instead of the old broken top-level
+// hrefs siteContent.js's own mock posts used to point at.
+const latestPosts = blogPosts.slice(0, 3);
 
 export default function BlogSection() {
   return (
@@ -12,9 +20,9 @@ export default function BlogSection() {
       </div>
 
       <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
-        {blogSection.posts.map((post) => (
+        {latestPosts.map((post) => (
           <Link key={post.href} href={post.href} className="group flex flex-col gap-4">
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div className="relative aspect-4/3 overflow-hidden">
               <Image
                 src={post.image}
                 alt={post.title}

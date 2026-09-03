@@ -25,15 +25,22 @@ export const nav = {
   // data/productCategories.js, so the dropdown and the routes never drift apart.
   megaMenu: {
     columns: [
+      // This column is the one entry from the old fake nested-category data
+      // that's still live — the Footer (see `footer.columnGroups` below)
+      // pulls it directly by heading. No real backend category matches any
+      // of these labels, so every href here falls back to /shop rather than
+      // a dead nested slug. The other columns below are otherwise unused
+      // (superseded by ShopDropdown/Navbar's live category-tree fetch) and
+      // are left as-is.
       {
         heading: "Carpets",
-        href: "/product-category/carpets/",
+        href: "/shop/",
         links: [
-          { label: "Transitional", href: "/product-category/carpets/transitional/" },
-          { label: "Modern", href: "/product-category/carpets/modern" },
-          { label: "Timeless Classics", href: "/product-category/carpets/timeless-classics/" },
-          { label: "Antique Persians", href: "/product-category/carpets/antique-persians" },
-          { label: "Vintage Collectibles", href: "/product-category/carpets/vintage-collectibles" },
+          { label: "Transitional", href: "/shop/" },
+          { label: "Modern", href: "/shop/" },
+          { label: "Timeless Classics", href: "/shop/" },
+          { label: "Antique Persians", href: "/shop/" },
+          { label: "Vintage Collectibles", href: "/shop/" },
         ],
       },
       {
@@ -94,6 +101,12 @@ export const searchField = {
   placeholder: "Search products...",
 };
 
+// heroSlides' cta.href previously pointed at fake nested category paths
+// (e.g. /product-category/carpets/) from the old mock category system.
+// None of those slugs exist as real backend categories, so every slide's
+// CTA falls back to /shop rather than linking to a slug that doesn't exist
+// — re-point these to a real category slug if/when one is a good match for
+// a given slide's imagery.
 export const heroSlides = [
   {
     id: "slide-1",
@@ -101,7 +114,7 @@ export const heroSlides = [
     subtitle: null,
     imageDesktop: "/images/Desktop-1.jpg",
     imageMobile: "/images/Mobile-1.jpg",
-    cta: { label: "Shop Now", href: "/product-category/carpets/" },
+    cta: { label: "Shop Now", href: "/shop/" },
   },
   {
     id: "slide-2",
@@ -109,7 +122,7 @@ export const heroSlides = [
     subtitle: "Expressionist-inspired Erased Luxe rugs",
     imageDesktop: "/images/Desktop-2.jpg",
     imageMobile: "/images/Mobile-2.jpg",
-    cta: { label: "Shop Now", href: "/product-category/carpets/" },
+    cta: { label: "Shop Now", href: "/shop/" },
   },
   {
     id: "slide-3",
@@ -117,7 +130,7 @@ export const heroSlides = [
     subtitle: "Handwoven treasures from across the globe",
     imageDesktop: "/images/Desktop-3.jpg",
     imageMobile: "/images/Mobile-3.jpg",
-    cta: { label: "Shop Now", href: "/product-category/carpets/" },
+    cta: { label: "Shop Now", href: "/shop/" },
   },
   {
     id: "slide-4",
@@ -126,7 +139,7 @@ export const heroSlides = [
     imageDesktop: "/images/Home-Banner-Desktop_Slide-4-1.jpg",
     // Missing on the live site itself (404) — see conversion notes.
     imageMobile: "/images/placeholder-hero-mobile-slide-4.jpg",
-    cta: { label: "Shop Now", href: "/product-category/carpets/" },
+    cta: { label: "Shop Now", href: "/shop/" },
   },
   {
     id: "slide-5",
@@ -134,10 +147,18 @@ export const heroSlides = [
     subtitle: "Heirlooms of yesterday, masterpieces of today",
     imageDesktop: "/images/Home-Banner-Desktop_Slide-5-1.jpg",
     imageMobile: "/images/Home-Banner-Mobile_Slide-5-1.jpg",
-    cta: { label: "Shop Now", href: "/product-category/carpets/" },
+    cta: { label: "Shop Now", href: "/shop/" },
   },
 ];
 
+// categories[].href previously pointed at fake nested category paths (and,
+// for the last two, a /product-tag/ route that never existed in this app
+// at all). Cross-referenced against the real backend categories (GET
+// /api/categories) — the only category that exists there is a malformed
+// leftover test record with no real `name`, so there's no reasonable match
+// for any of these curated picks. All 8 fall back to /shop rather than
+// linking to a slug that doesn't exist. Re-point individual entries to a
+// real category slug once matching real categories exist in the DB.
 export const bestsellingCollections = {
   heading: "Our bestselling collections",
   subheading: "World's finest curated treasures",
@@ -145,41 +166,41 @@ export const bestsellingCollections = {
     {
       name: "Modern Rugs",
       image: "/images/Modern.jpg",
-      href: "/product-category/carpets/modern",
+      href: "/shop/",
       description: "Browse newly created designs inspired by art, architecture and more.",
     },
     {
       name: "Transitional Rugs",
       image: "/images/Bestselling_Transitional-1.jpg",
-      href: "/product-category/carpets/transitional/",
+      href: "/shop/",
       description: "Hunt for treasures amidst these transitional designs and sophisticated colour palettes.",
     },
     {
       name: "Timeless Classics",
       image: "/images/Timeless-Classics.jpg",
-      href: "/product-category/carpets/timeless-classics/",
+      href: "/shop/",
       description: "Our range of skillful reproductions of cherished antiques from Persia, Middle East, and more.",
     },
     {
       name: "Antique Persians",
       image: "/images/Antique-Persian.jpg",
-      href: "/product-category/carpets/antique-persians",
+      href: "/shop/",
       description: "Invest in a family heirloom and take home a genuine antique carpet to suit any home.",
     },
     {
       name: "Kilims",
       image: "/images/Kilims.jpg",
-      href: "/product-category/kilims/",
+      href: "/shop/",
       description: "Discover antique Kilims from Persia and Central Asia and their exquisite reproductions.",
     },
     {
       name: "Vintage Collectibles",
       image: "/images/Bestselling_Vintage-Collectibles-1.jpg",
-      href: "/product-category/carpets/vintage-collectibles",
+      href: "/shop/",
       description: "Make a statement with striking Kilim and Vintage Collectibles from nomadic cultures.",
     },
-    { name: "Ornamental Florals", image: "/images/Ornamental-Florals-1.jpg", href: "/product-tag/Floral-Rugs/", featured: true },
-    { name: "Geometric Vintage Treasures", image: "/images/Geometric-Vintage-Treasures-1.jpg", href: "/product-tag/Geometric-Rugs/", featured: true },
+    { name: "Ornamental Florals", image: "/images/Ornamental-Florals-1.jpg", href: "/shop/", featured: true },
+    { name: "Geometric Vintage Treasures", image: "/images/Geometric-Vintage-Treasures-1.jpg", href: "/shop/", featured: true },
   ],
 };
 
@@ -324,24 +345,26 @@ export const instagramFeed = {
     bio: "Fine handwoven & hand knotted carpets rugs wall hangings vintage textiles from India, Persia & beyond @unique_carpet_doha",
     followHref: "https://www.instagram.com/unique_carpet_doha?utm_source=qr",
   },
-  // The live export lazy-loads these from Instagram's own CDN via JS; the raw HTML only
-  // contains the plugin's placeholder image, so no real post photos were available to copy.
+  // Real lifestyle photos supplied for this section (public/followImage/) —
+  // replaces the earlier placeholder image (the live export lazy-loads
+  // these from Instagram's own CDN via JS, so no real post photos were
+  // available to copy from the raw HTML at the time).
   posts: [
     {
       caption: "The last thing you see before you sleep. The first thing your feet find in the morning.",
-      image: "/images/instagram-placeholder.png",
+      image: "/followImage/follow-1.jpg",
     },
     {
       caption: "Resistance has never needed a podium. Sometimes it just needs a loom, a needle, and the quiet stubbornness of people who refused to let their story disappear.",
-      image: "/images/instagram-placeholder.png",
+      image: "/followImage/follow-2.jpg",
     },
     {
       caption: "The sky broke open. And the room finally matched the mood.",
-      image: "/images/instagram-placeholder.png",
+      image: "/followImage/follow-3.jpg",
     },
     {
       caption: "The 1920s called. They want their confidence back! Bold lines. Perfect symmetry. Effortless glamour.",
-      image: "/images/instagram-placeholder.png",
+      image: "/followImage/follow-4.jpg",
     },
   ],
 };
@@ -459,16 +482,4 @@ export const footer = {
   ],
   // Distinct legal entity name shown in the source — left unchanged, it is not the brand name.
   copyright: "Woolsheel Traders Pvt. Ltd",
-};
-
-export const cartDrawer = {
-  title: "Shopping Cart",
-  emptyMessage: "Your cart is currently empty.",
-  subtotalLabel: "Subtotal",
-  taxLabel: "Tax",
-  totalLabel: "Total",
-  checkoutLabel: "Checkout",
-  viewCartLabel: "View cart",
-  noteLabel: "Note",
-  couponLabel: "Coupon",
 };

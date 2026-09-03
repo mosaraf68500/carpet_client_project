@@ -7,6 +7,23 @@ import CategoryForm from "@/components/categories/CategoryForm";
 import Button from "@/components/ui/Button";
 import { LoadingState, ErrorState, EmptyState } from "@/components/ui/StatusState";
 
+// Re-orders the flat, name-sorted list from the API so each subcategory
+// sits directly under its parent (the API only sorts by name, which would
+// otherwise scatter a subcategory anywhere in the alphabet, undermining
+// the point of indenting it). Any subcategory whose parent isn't in this
+// list (shouldn't normally happen) still appears, just not grouped.
+function groupByHierarchy(categories) {
+  const topLevel = categories.filter((c) => !c.parentCategory);
+  const grouped = [];
+  for (const top of topLevel) {
+    grouped.push(top);
+    grouped.push(...categories.filter((c) => c.parentCategory === top._id));
+  }
+  const groupedIds = new Set(grouped.map((c) => c._id));
+  grouped.push(...categories.filter((c) => !groupedIds.has(c._id)));
+  return grouped;
+}
+
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error
@@ -124,30 +141,38 @@ export default function CategoriesPage() {
               </tr>
             </thead>
             <tbody>
-              {categories.map((category) => (
-                <tr key={category._id} className="border-b border-border last:border-b-0">
-                  <td className="px-4 py-3">
-                    {category.image?.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={category.image.url} alt="" className="h-12 w-12 rounded-xs object-cover" />
-                    ) : (
-                      <div className="h-12 w-12 rounded-xs bg-box-grey" />
-                    )}
-                  </td>
-                  <td className="px-4 py-3 font-medium text-heading">{category.name}</td>
-                  <td className="px-4 py-3 text-body">{category.slug}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-4">
-                      <Button variant="link" onClick={() => handleEditClick(category)}>
-                        Edit
-                      </Button>
-                      <Button variant="linkDanger" onClick={() => handleDelete(category)}>
-                        Delete
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {groupByHierarchy(categories).map((category) => {
+                const parent = category.parentCategory
+                  ? categories.find((c) => c._id === category.parentCategory)
+                  : null;
+                return (
+                  <tr key={category._id} className="border-b border-border last:border-b-0">
+                    <td className="px-4 py-3">
+                      {category.image?.url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={category.image.url} alt="" className="h-12 w-12 rounded-xs object-cover" />
+                      ) : (
+                        <div className="h-12 w-12 rounded-xs bg-box-grey" />
+                      )}
+                    </td>
+                    <td className={`px-4 py-3 font-medium text-heading ${parent ? "pl-10" : ""}`}>
+                      {category.name}
+                      {parent && <p className="text-xs font-normal text-text-light">Under: {parent.name}</p>}
+                    </td>
+                    <td className="px-4 py-3 text-body">{category.slug}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-4">
+                        <Button variant="link" onClick={() => handleEditClick(category)}>
+                          Edit
+                        </Button>
+                        <Button variant="linkDanger" onClick={() => handleDelete(category)}>
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

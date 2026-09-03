@@ -18,6 +18,7 @@ export interface IProduct extends Document {
   sizes: ISize[];
   images: IProductImage[];
   isActive: boolean; // lets dashboard hide a product without deleting it
+  homepageSection: "bestselling" | "curated" | "spotlight" | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,12 +48,19 @@ const productSchema = new Schema<IProduct>(
     sizes: { type: [sizeSchema], default: [] },
     images: { type: [imageSchema], default: [] },
     isActive: { type: Boolean, default: true },
+    homepageSection: {
+      type: String,
+      enum: ["bestselling", "curated", "spotlight", null],
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
 // Supports category + size filtering from the Shop page in one query
 productSchema.index({ category: 1, isActive: 1 });
+// Supports the homepage's per-section product queries
+productSchema.index({ homepageSection: 1, isActive: 1 });
 
 const Product: Model<IProduct> = mongoose.model<IProduct>("Product", productSchema);
 

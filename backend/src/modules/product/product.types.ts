@@ -8,6 +8,7 @@ export interface CreateProductBody {
   description?: string;
   category?: string;
   sizes?: string;
+  homepageSection?: string;
 }
 
 export interface UpdateProductBody {
@@ -17,6 +18,7 @@ export interface UpdateProductBody {
   sizes?: string;
   isActive?: string | boolean;
   removeImagePublicIds?: string;
+  homepageSection?: string;
 }
 
 // Query params always arrive as strings (or are absent) regardless of the
@@ -26,6 +28,7 @@ export interface ProductQuery {
   unit?: string;
   minSize?: string;
   maxSize?: string;
+  homepageSection?: string;
   page?: string;
   limit?: string;
 }

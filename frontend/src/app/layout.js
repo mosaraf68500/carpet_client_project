@@ -10,7 +10,6 @@ import { UIProvider } from "@/components/layout/UIProvider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MobileMenu from "@/components/layout/MobileMenu";
-import CartDrawer from "@/components/layout/CartDrawer";
 import FloatingContactButtons from "@/components/layout/FloatingContactButtons";
 import JsonLd from "@/components/common/JsonLd";
 import { SITE_URL, organizationJsonLd } from "@/lib/seo";
@@ -68,7 +67,6 @@ export default function RootLayout({ children }) {
           <main className="flex-1">{children}</main>
           <Footer />
           <MobileMenu />
-          <CartDrawer />
           <FloatingContactButtons />
         </UIProvider>
       </body>

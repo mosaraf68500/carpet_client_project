@@ -35,10 +35,25 @@ export const getAllServicesForAdmin = asyncHandler(async (_req: Request, res: Re
   res.json(services);
 });
 
+// upload.fields([...]) puts req.files as { [fieldname]: File[] } rather
+// than the single File | File[] shapes .single()/.array() produce.
+type ServiceFilesMap = Record<"image" | "contentImage" | "slideImages", Express.Multer.File[] | undefined>;
+
+function pickServiceFiles(req: {
+  files?: unknown;
+}): { image?: Express.Multer.File; contentImage?: Express.Multer.File; slideImages?: Express.Multer.File[] } {
+  const files = req.files as ServiceFilesMap | undefined;
+  return {
+    image: files?.image?.[0],
+    contentImage: files?.contentImage?.[0],
+    slideImages: files?.slideImages,
+  };
+}
+
 // @route POST /api/services  (protected)
 export const createService = asyncHandler(
   async (req: Request<unknown, unknown, CreateServiceBody>, res: Response) => {
-    const service = await serviceLogic.createService({ ...req.body, file: req.file });
+    const service = await serviceLogic.createService({ ...req.body, ...pickServiceFiles(req) });
     res.status(201).json(service);
   }
 );
@@ -48,7 +63,7 @@ export const updateService = asyncHandler(
   async (req: Request<{ id: string }, unknown, UpdateServiceBody>, res: Response) => {
     const service = await serviceLogic.updateService(req.params.id, {
       ...req.body,
-      file: req.file,
+      ...pickServiceFiles(req),
     });
     res.json(service);
   }

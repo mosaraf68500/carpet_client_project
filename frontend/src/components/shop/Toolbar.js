@@ -1,34 +1,17 @@
-"use client";
+import { shopToolbar } from "@/data/shopContent";
 
-import { useState } from "react";
-import { FiltersToggleButton } from "./FilterSidebar";
-import { sortOptions, shopToolbar } from "@/data/shopContent";
-
-export default function Toolbar({ shownCount }) {
-  const [sort, setSort] = useState(sortOptions[0].value);
+// Copy template ("Showing {shown} of {total} results") still comes from
+// shopContent.js — that's presentation text, not product data. `total` is
+// now the real paginated count from the API, replacing the old hardcoded
+// shopToolbar.totalResults value.
+export default function Toolbar({ shownCount, total }) {
   const resultText = shopToolbar.resultCountTemplate
     .replace("{shown}", shownCount)
-    .replace("{total}", shopToolbar.totalResults);
+    .replace("{total}", total);
 
   return (
-    <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
-      <FiltersToggleButton />
+    <div className="mb-8 border-b border-border pb-6">
       <p className="text-sm text-text-light">{resultText}</p>
-      <label className="ml-auto flex items-center gap-2 text-sm">
-        <span className="sr-only">Shop order</span>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          aria-label="Shop order"
-          className="border border-border-form bg-white px-3 py-2 text-sm"
-        >
-          {sortOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </label>
     </div>
   );
 }

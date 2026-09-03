@@ -130,6 +130,24 @@
   animation: ripple-wave 2s ease-out infinite;
 }
 
+/* Hero text/button entrance: rises up from below into place. Re-keyed by
+   slide index in Hero.js so it replays on every slide change, not just
+   once on page load. */
+@keyframes hero-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-fade-up {
+  animation: hero-fade-up 0.8s ease-out both;
+}
+
 /* Respect prefers-reduced-motion for all hover/transition animations in one
    place, rather than adding motion-reduce: variants to every transition. */
 @media (prefers-reduced-motion: reduce) {

@@ -1,8 +1,10 @@
 import CategoryCard from "@/components/common/CategoryCard";
 
-// Presentational grid of category cards, reused by BestsellingCollections (and
-// available for other category-card sections later).
-export default function CategoryGrid({ categories, columns = 4 }) {
+// Presentational grid of category cards, reused by BestsellingCollections
+// and the /shop category grid — mobileColumns defaults to 2 so /shop's
+// layout doesn't change; BestsellingCollections passes 1 explicitly.
+export default function CategoryGrid({ categories, columns = 4, mobileColumns = 2 }) {
+  const mobileClass = mobileColumns === 1 ? "grid-cols-1" : "grid-cols-2";
   const colsClass =
     columns === 4
       ? "sm:grid-cols-2 lg:grid-cols-4"
@@ -11,7 +13,7 @@ export default function CategoryGrid({ categories, columns = 4 }) {
       : "sm:grid-cols-2";
 
   return (
-    <div className={`grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-8 ${colsClass}`}>
+    <div className={`grid ${mobileClass} gap-x-6 gap-y-10 sm:gap-x-8 ${colsClass}`}>
       {categories.map((cat) => (
         <CategoryCard
           key={cat.name}

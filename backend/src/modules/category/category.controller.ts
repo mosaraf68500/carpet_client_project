@@ -10,14 +10,17 @@ import {
 import type {
   CreateCategoryBody,
   UpdateCategoryBody,
+  CategoryQuery,
   DeleteCategoryResponse,
 } from "./category.types.js";
 
-// @route GET /api/categories  (public)
-export const getCategories = asyncHandler(async (_req: Request, res: Response) => {
-  const categories = await getCategoriesService();
-  res.json(categories);
-});
+// @route GET /api/categories?parent=<id|null|root>  (public)
+export const getCategories = asyncHandler(
+  async (req: Request<unknown, unknown, unknown, CategoryQuery>, res: Response) => {
+    const categories = await getCategoriesService(req.query);
+    res.json(categories);
+  }
+);
 
 // @route GET /api/categories/:slug  (public)
 export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response) => {
@@ -28,7 +31,11 @@ export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response
 // @route POST /api/categories  (protected)
 export const createCategory = asyncHandler(
   async (req: Request<unknown, unknown, CreateCategoryBody>, res: Response) => {
-    const category = await createCategoryService({ name: req.body.name, file: req.file });
+    const category = await createCategoryService({
+      name: req.body.name,
+      file: req.file,
+      parentCategory: req.body.parentCategory,
+    });
     res.status(201).json(category);
   }
 );
@@ -39,6 +46,7 @@ export const updateCategory = asyncHandler(
     const category = await updateCategoryService(req.params.id, {
       name: req.body.name,
       file: req.file,
+      parentCategory: req.body.parentCategory,
     });
     res.json(category);
   }

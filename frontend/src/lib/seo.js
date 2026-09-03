@@ -92,20 +92,17 @@ export function breadcrumbJsonLd(items) {
   };
 }
 
+// No `offers`/price block — this business shows no pricing anywhere on the
+// site (WhatsApp/call/quote only), so real product data has no price field
+// to report here, and emitting an empty or fabricated price would be worse
+// than omitting `offers` entirely (which schema.org's Product type allows).
 export function productJsonLd(product) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
-    image: product.image ? [absoluteUrl(product.image)] : undefined,
+    image: product.images?.[0]?.url ? [absoluteUrl(product.images[0].url)] : undefined,
     description: product.description || undefined,
     sku: product.slug,
-    offers: {
-      "@type": "Offer",
-      url: absoluteUrl(`/product/${product.slug}/`),
-      priceCurrency: "INR",
-      price: product.priceOnRequest ? undefined : (product.price || "").replace(/[^\d.]/g, ""),
-      availability: "https://schema.org/InStock",
-    },
   };
 }

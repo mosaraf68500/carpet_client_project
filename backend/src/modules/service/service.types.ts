@@ -10,6 +10,7 @@ export interface CreateServiceBody {
   title?: string;
   intro?: string;
   steps?: string;
+  contentTitle?: string;
 }
 
 export interface UpdateServiceBody {
@@ -17,6 +18,8 @@ export interface UpdateServiceBody {
   intro?: string;
   steps?: string;
   isActive?: string | boolean;
+  contentTitle?: string;
+  removeSlideImagePublicIds?: string;
 }
 
 export interface DeleteServiceResponse {

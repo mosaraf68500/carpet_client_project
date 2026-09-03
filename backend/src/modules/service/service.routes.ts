@@ -20,8 +20,17 @@ router.get("/", getServices);
 router.get("/admin/all", protect, getAllServicesForAdmin); // must come before "/:slug"
 router.get("/:slug", getServiceBySlug);
 
-router.post("/", protect, upload.single("image"), createService);
-router.put("/:id", protect, upload.single("image"), updateService);
+// "image" = hero banner, "contentImage" = the 2nd section's related photo,
+// "slideImages" = the multi-image slideshow shown above "Our Promise" —
+// independent file fields, so .fields() replaces .single()/.array().
+const serviceImageUpload = upload.fields([
+  { name: "image", maxCount: 1 },
+  { name: "contentImage", maxCount: 1 },
+  { name: "slideImages", maxCount: 8 },
+]);
+
+router.post("/", protect, serviceImageUpload, createService);
+router.put("/:id", protect, serviceImageUpload, updateService);
 router.delete("/:id", protect, deleteService);
 
 export default router;

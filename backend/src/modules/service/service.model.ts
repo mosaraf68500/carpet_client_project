@@ -20,6 +20,16 @@ export interface IService extends Document {
   intro: string;
   steps: IStep[];
   image: IServiceImage;
+  // contentTitle/contentImage back the page's 2nd section (heading +
+  // description + a related photo, side by side) — separate from `title`
+  // (used for the hero overlay) and `image` (the hero banner), so a page
+  // like the reference design can show different text/photo in each spot.
+  contentTitle: string;
+  contentImage: IServiceImage;
+  // A slideshow gallery shown above "Our Promise" on the service page —
+  // separate from the single hero/content images since this is a growing
+  // multi-image collection, not one replaceable photo.
+  slideImages: IServiceImage[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -29,6 +39,14 @@ const stepSchema = new Schema<IStep>(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
+  },
+  { _id: false }
+);
+
+const serviceImageSchema = new Schema<IServiceImage>(
+  {
+    url: { type: String, default: "" },
+    publicId: { type: String, default: "" },
   },
   { _id: false }
 );
@@ -43,6 +61,12 @@ const serviceSchema = new Schema<IService>(
       url: { type: String, default: "" },
       publicId: { type: String, default: "" },
     },
+    contentTitle: { type: String, default: "" },
+    contentImage: {
+      url: { type: String, default: "" },
+      publicId: { type: String, default: "" },
+    },
+    slideImages: { type: [serviceImageSchema], default: [] },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

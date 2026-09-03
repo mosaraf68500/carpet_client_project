@@ -21,4 +21,10 @@ export const quoteForm = {
   messagePlaceholder: "Size, colour, budget, or any other details…",
   submitLabel: "Send request",
   successMessage: "Thanks — your request has been received. We'll be in touch shortly.",
+  errorMessage:
+    "Something went wrong — please try WhatsApp or Call instead, or try sending this again in a moment.",
+  nameRequiredError: "Please enter your name.",
+  phoneRequiredError: "Please enter a phone number.",
+  emailRequiredError: "Please enter your email.",
+  emailInvalidError: "Please enter a valid email address.",
 };
