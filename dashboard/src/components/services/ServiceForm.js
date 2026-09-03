@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { createService, updateService } from "@/lib/api";
+import { uploadImagesToCloudinary } from "@/lib/cloudinaryUpload";
 import Button from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/StatusState";
+import ImageUpload from "@/components/common/ImageUpload";
 
 // No real cap on how many slides an editor can add ("as many as they
 // want") — this just keeps a sane upper bound rather than being an actual
@@ -25,82 +28,52 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
   const [intro, setIntro] = useState(existingService?.intro || "");
   const [isActive, setIsActive] = useState(existingService?.isActive ?? true);
 
+  // Backs the public page's "Our Process" section — {title, description}[],
+  // optional (an empty array is valid; the backend has no minimum-count
+  // requirement). Up/down buttons for reordering rather than drag-and-drop:
+  // this project has no drag-and-drop library anywhere, and a handful of
+  // steps doesn't need one — buttons are simpler, keyboard-accessible, and
+  // add zero new dependencies.
+  const [steps, setSteps] = useState(
+    existingService?.steps?.length ? existingService.steps.map((s) => ({ ...s })) : []
+  );
+
+  const addStep = () => setSteps((prev) => [...prev, { title: "", description: "" }]);
+
+  const updateStep = (index, field, value) =>
+    setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
+
+  const removeStep = (index) => setSteps((prev) => prev.filter((_, i) => i !== index));
+
+  const moveStep = (index, direction) => {
+    setSteps((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  };
+
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
   const [contentImageFile, setContentImageFile] = useState(null);
-  const [contentImagePreview, setContentImagePreview] = useState("");
 
   const [removedSlidePublicIds, setRemovedSlidePublicIds] = useState([]);
   const [newSlideFiles, setNewSlideFiles] = useState([]);
-  const [slideImageWarning, setSlideImageWarning] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [error, setError] = useState("");
-
-  // Native <input type="file"> is visually hidden (see the "Upload Image"
-  // buttons below) — these refs are how the buttons open the real file
-  // picker instead of relying on <label htmlFor>, which doesn't play well
-  // with the shared Button component's own <button> element.
-  const heroImageInputRef = useRef(null);
-  const contentImageInputRef = useRef(null);
-  const slideImageInputRef = useRef(null);
-
-  // Cleanup only — no setState here, so this isn't a "derive state from an
-  // effect" pattern. The URLs themselves are created in the file inputs'
-  // change handlers, event handlers, where side effects are expected.
-  useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-      if (contentImagePreview) URL.revokeObjectURL(contentImagePreview);
-    };
-  }, [imagePreview, contentImagePreview]);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0] || null;
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImageFile(file);
-    setImagePreview(file ? URL.createObjectURL(file) : "");
-  };
-
-  const handleContentImageChange = (e) => {
-    const file = e.target.files?.[0] || null;
-    if (contentImagePreview) URL.revokeObjectURL(contentImagePreview);
-    setContentImageFile(file);
-    setContentImagePreview(file ? URL.createObjectURL(file) : "");
-  };
 
   const remainingExistingSlides = useMemo(
     () => (existingService?.slideImages || []).filter((img) => !removedSlidePublicIds.includes(img.publicId)),
     [existingService, removedSlidePublicIds]
   );
 
-  const [newSlidePreviews, setNewSlidePreviews] = useState([]);
-
-  useEffect(() => {
-    const previews = newSlideFiles.map((file) => ({ file, url: URL.createObjectURL(file) }));
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNewSlidePreviews(previews);
-    return () => {
-      previews.forEach((preview) => URL.revokeObjectURL(preview.url));
-    };
-  }, [newSlideFiles]);
-
   // Appends to the existing selection rather than replacing it — an editor
   // picking one image, seeing it added, then opening the picker again for
   // another should end up with both, not just the most recent pick.
-  const handleSlideFilesChange = (e) => {
-    const pickedFiles = Array.from(e.target.files || []);
-    const slotsLeft = Math.max(0, MAX_SLIDE_IMAGES - remainingExistingSlides.length - newSlideFiles.length);
-
-    if (pickedFiles.length > slotsLeft) {
-      setSlideImageWarning(`Only ${slotsLeft} more image${slotsLeft === 1 ? "" : "s"} allowed — extra files were not added.`);
-    } else {
-      setSlideImageWarning("");
-    }
-
-    setNewSlideFiles((prev) => [...prev, ...pickedFiles.slice(0, slotsLeft)]);
-    e.target.value = "";
-  };
+  const addNewSlides = (files) => setNewSlideFiles((prev) => [...prev, ...files]);
 
   const removeNewSlide = (fileToRemove) => {
     setNewSlideFiles((prev) => prev.filter((file) => file !== fileToRemove));
@@ -114,36 +87,64 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
     e.preventDefault();
     setError("");
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("contentTitle", contentTitle);
-    formData.append("intro", intro);
-    if (imageFile) formData.append("image", imageFile);
-    if (contentImageFile) formData.append("contentImage", contentImageFile);
-    if (isEditing) {
-      formData.append("isActive", String(isActive));
-      if (removedSlidePublicIds.length > 0) {
-        formData.append("removeSlideImagePublicIds", JSON.stringify(removedSlidePublicIds));
-      }
-    }
-    newSlideFiles.forEach((file) => formData.append("slideImages", file));
+    // Drop rows the admin added but never finished — the backend requires
+    // both title and description on any step that's actually sent.
+    const completeSteps = steps.filter((s) => s.title.trim() && s.description.trim());
+
+    // Uploaded together (one XHR each, all in parallel) so the progress bar
+    // reflects one combined 0-100 across hero/content/slide images at once,
+    // then split back out by the slot each file came from.
+    const slots = [
+      ...(imageFile ? [{ kind: "image", file: imageFile }] : []),
+      ...(contentImageFile ? [{ kind: "contentImage", file: contentImageFile }] : []),
+      ...newSlideFiles.map((file) => ({ kind: "slide", file })),
+    ];
+    const hasUploads = slots.length > 0;
 
     setSubmitting(true);
+    setUploadProgress(hasUploads ? 0 : null);
+
     try {
+      const uploaded = await uploadImagesToCloudinary(
+        slots.map((s) => s.file),
+        setUploadProgress
+      );
+      if (hasUploads) setUploadProgress(100);
+
+      const newSlideImages = [];
+      let heroImage;
+      let sectionImage;
+      slots.forEach((slot, i) => {
+        if (slot.kind === "image") heroImage = uploaded[i];
+        else if (slot.kind === "contentImage") sectionImage = uploaded[i];
+        else newSlideImages.push(uploaded[i]);
+      });
+
+      const payload = {
+        title,
+        contentTitle,
+        intro,
+        steps: completeSteps,
+        slideImages: [...remainingExistingSlides, ...newSlideImages],
+      };
+      if (heroImage) payload.image = heroImage;
+      if (sectionImage) payload.contentImage = sectionImage;
       if (isEditing) {
-        await updateService(existingService._id, formData);
+        payload.isActive = isActive;
+      }
+
+      if (isEditing) {
+        await updateService(existingService._id, payload);
       } else {
-        await createService(formData);
+        await createService(payload);
       }
       onSuccess();
     } catch (err) {
       setError(err.message || "Failed to save service.");
       setSubmitting(false);
+      setUploadProgress(null);
     }
   };
-
-  const currentHeroImageUrl = imagePreview || existingService?.image?.url;
-  const currentContentImageUrl = contentImagePreview || existingService?.contentImage?.url;
 
   return (
     <form
@@ -175,26 +176,19 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
         <p className="text-xs text-text-light">Shown as the page heading and over the hero image below.</p>
       </div>
 
-      <div className="flex flex-col gap-2 md:col-span-2">
-        <span className="text-sm">Hero Image</span>
-        {currentHeroImageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={currentHeroImageUrl} alt="" className="h-20 w-20 rounded-xs object-cover" />
-        )}
-        <input
-          ref={heroImageInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={handleImageChange}
-          className="hidden"
+      <div className="md:col-span-2">
+        <ImageUpload
+          label="Hero Image"
+          existingImages={
+            !imageFile && existingService?.image?.url
+              ? [{ id: existingService.image.publicId, url: existingService.image.url }]
+              : []
+          }
+          newFiles={imageFile ? [imageFile] : []}
+          onAddFiles={(files) => setImageFile(files[0])}
+          onRemoveNew={() => setImageFile(null)}
+          disabled={submitting}
         />
-        <Button type="button" variant="secondary" className="self-start" onClick={() => heroImageInputRef.current?.click()}>
-          Upload Image
-        </Button>
-        {imageFile && <p className="text-xs text-text-light">Selected: {imageFile.name}</p>}
-        {isEditing && !imageFile && (
-          <p className="text-xs text-text-light">Choose a file to replace the current hero image.</p>
-        )}
       </div>
 
       <div className="flex flex-col gap-1 md:col-span-2">
@@ -224,95 +218,98 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
         />
       </div>
 
-      <div className="flex flex-col gap-2 md:col-span-2">
-        <span className="text-sm">Image</span>
-        {currentContentImageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={currentContentImageUrl} alt="" className="h-20 w-20 rounded-xs object-cover" />
-        )}
-        <input
-          ref={contentImageInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={handleContentImageChange}
-          className="hidden"
+      <div className="md:col-span-2">
+        <ImageUpload
+          label="Image"
+          existingImages={
+            !contentImageFile && existingService?.contentImage?.url
+              ? [{ id: existingService.contentImage.publicId, url: existingService.contentImage.url }]
+              : []
+          }
+          newFiles={contentImageFile ? [contentImageFile] : []}
+          onAddFiles={(files) => setContentImageFile(files[0])}
+          onRemoveNew={() => setContentImageFile(null)}
+          disabled={submitting}
         />
-        <Button
-          type="button"
-          variant="secondary"
-          className="self-start"
-          onClick={() => contentImageInputRef.current?.click()}
-        >
-          Upload Image
-        </Button>
-        {contentImageFile && <p className="text-xs text-text-light">Selected: {contentImageFile.name}</p>}
-        {isEditing && !contentImageFile && (
-          <p className="text-xs text-text-light">Choose a file to replace the current image.</p>
-        )}
       </div>
 
-      <div className="flex flex-col gap-2 md:col-span-2">
-        <span className="text-sm">Slide Image</span>
+      <div className="flex flex-col gap-3 md:col-span-2">
+        <span className="text-sm">Steps</span>
         <p className="text-xs text-text-light">
-          Shown as a slideshow above &quot;Our Promise&quot; on the service page. Add as many as you like — one at a
-          time or several at once.
+          Shown as the numbered &quot;Our Process&quot; list on the service page. Optional — leave empty to hide that
+          list.
         </p>
 
-        {remainingExistingSlides.length > 0 && (
-          <div className="flex flex-wrap gap-3">
-            {remainingExistingSlides.map((img) => (
-              <div key={img.publicId} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.url} alt="" className="h-20 w-20 rounded-xs object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeExistingSlide(img.publicId)}
-                  aria-label="Remove image"
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black text-xs text-white hover:bg-primary"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        {steps.map((step, index) => (
+          <div key={index} className="flex gap-3 rounded-xs border border-border-form p-4">
+            <div className="flex flex-col gap-1 pt-1">
+              <button
+                type="button"
+                onClick={() => moveStep(index, -1)}
+                disabled={index === 0}
+                aria-label="Move step up"
+                className="text-text-light hover:text-heading disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <ChevronUp size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => moveStep(index, 1)}
+                disabled={index === steps.length - 1}
+                aria-label="Move step down"
+                className="text-text-light hover:text-heading disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <ChevronDown size={16} />
+              </button>
+            </div>
 
-        <input
-          ref={slideImageInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          onChange={handleSlideFilesChange}
-          className="hidden"
-        />
-        <Button
-          type="button"
-          variant="secondary"
-          className="self-start"
-          onClick={() => slideImageInputRef.current?.click()}
-        >
-          Upload Image
+            <div className="flex flex-1 flex-col gap-2">
+              <input
+                type="text"
+                value={step.title}
+                onChange={(e) => updateStep(index, "title", e.target.value)}
+                placeholder={`Step ${index + 1} title`}
+                className="w-full border border-border-form px-3 py-2 text-sm focus:border-black focus:outline-none"
+              />
+              <textarea
+                value={step.description}
+                onChange={(e) => updateStep(index, "description", e.target.value)}
+                placeholder="Step description"
+                rows={2}
+                className="w-full border border-border-form px-3 py-2 text-sm focus:border-black focus:outline-none"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => removeStep(index)}
+              aria-label="Remove step"
+              className="self-start text-text-light hover:text-primary-text"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        ))}
+
+        <Button type="button" variant="secondary" className="w-fit" onClick={addStep}>
+          <Plus size={16} />
+          Add step
         </Button>
-        {slideImageWarning && <p className="text-sm text-primary-text">{slideImageWarning}</p>}
+      </div>
 
-        {newSlidePreviews.length > 0 && (
-          <div className="flex flex-wrap gap-3">
-            {newSlidePreviews.map((preview) => (
-              <div key={preview.url} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={preview.url} alt="" className="h-20 w-20 rounded-xs object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeNewSlide(preview.file)}
-                  aria-label="Remove image"
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black text-xs text-white hover:bg-primary"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="md:col-span-2">
+        <ImageUpload
+          multiple
+          maxFiles={MAX_SLIDE_IMAGES}
+          label="Slide Image"
+          helperText='Shown as a slideshow above "Our Promise" on the service page. Add as many as you like — one at a time or several at once.'
+          existingImages={remainingExistingSlides.map((img) => ({ id: img.publicId, url: img.url }))}
+          newFiles={newSlideFiles}
+          onAddFiles={addNewSlides}
+          onRemoveExisting={removeExistingSlide}
+          onRemoveNew={removeNewSlide}
+          disabled={submitting}
+        />
       </div>
 
       {isEditing && (
@@ -324,7 +321,15 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
 
       <div className="flex gap-3 md:col-span-2">
         <Button type="submit" variant="primary" disabled={submitting}>
-          {submitting ? "Saving…" : isEditing ? "Save changes" : "Create service"}
+          {submitting
+            ? uploadProgress !== null
+              ? uploadProgress < 100
+                ? `Uploading… ${uploadProgress}%`
+                : "Processing…"
+              : "Saving…"
+            : isEditing
+              ? "Save changes"
+              : "Create service"}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel

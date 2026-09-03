@@ -9,6 +9,7 @@ import {
   FolderTree,
   Wrench,
   MessageSquare,
+  CalendarCheck,
   Settings,
   LogOut,
   Menu,
@@ -22,6 +23,7 @@ const NAV_LINKS = [
   { href: "/categories", label: "Categories", icon: FolderTree },
   { href: "/services", label: "Services", icon: Wrench },
   { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/appointments", label: "Appointments", icon: CalendarCheck },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -48,7 +50,7 @@ export default function Sidebar() {
         >
           <Menu size={22} />
         </button>
-        <p className="text-sm font-semibold text-heading">Doha Furniture Admin</p>
+        <p className="text-sm font-semibold text-heading">Doha Carpet Admin</p>
         <span className="w-[22px]" aria-hidden="true" />
       </div>
 
@@ -68,7 +70,7 @@ export default function Sidebar() {
       >
         <div className="flex items-center justify-between px-6 py-8">
           <div>
-            <p className="text-lg font-semibold tracking-wide">Doha Furniture</p>
+            <p className="text-lg font-semibold tracking-wide">Doha Carpet</p>
             <p className="text-xs uppercase tracking-widest text-white/50">Admin</p>
           </div>
           <button

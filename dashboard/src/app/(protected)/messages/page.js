@@ -156,9 +156,20 @@ export default function MessagesPage() {
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className={`text-sm text-heading ${message.isRead ? "font-medium" : "font-semibold"}`}>
-                      {message.name}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className={`text-sm text-heading ${message.isRead ? "font-medium" : "font-semibold"}`}>
+                        {message.name}
+                      </p>
+                      <span
+                        className={`rounded-xs px-2 py-0.5 text-xs font-medium ${
+                          message.source === "quote"
+                            ? "bg-accent-green/10 text-accent-green"
+                            : "bg-box-grey text-text-light"
+                        }`}
+                      >
+                        {message.source === "quote" ? "Quote" : "Contact"}
+                      </span>
+                    </div>
                     <p className="text-sm text-body">
                       {message.phone} · {message.email}
                     </p>

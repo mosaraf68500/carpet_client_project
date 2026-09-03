@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Doha Furniture — Admin",
+  title: "Doha Carpet — Admin",
 };
 
 export default function RootLayout({ children }) {

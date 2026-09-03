@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getCategories, createProduct, updateProduct } from "@/lib/api";
+import { uploadImagesToCloudinary } from "@/lib/cloudinaryUpload";
 import Button from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/StatusState";
+import ImageUpload from "@/components/common/ImageUpload";
 
 const MAX_IMAGES = 8;
 
@@ -26,9 +28,9 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
 
   const [removedPublicIds, setRemovedPublicIds] = useState([]);
   const [newImageFiles, setNewImageFiles] = useState([]);
-  const [imageWarning, setImageWarning] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // 0-100, or null when not uploading
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -53,33 +55,7 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
     [existingProduct, removedPublicIds]
   );
 
-  const [newImagePreviews, setNewImagePreviews] = useState([]);
-
-  useEffect(() => {
-    const previews = newImageFiles.map((file) => ({ file, url: URL.createObjectURL(file) }));
-    // Not derivable in render: object URLs are a real browser resource that
-    // must be revoked, so creating them has to be tied to an effect's
-    // cleanup rather than recomputed (and leaked) on every render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNewImagePreviews(previews);
-    return () => {
-      previews.forEach((preview) => URL.revokeObjectURL(preview.url));
-    };
-  }, [newImageFiles]);
-
-  const handleFilesChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    const slotsLeft = Math.max(0, MAX_IMAGES - remainingExistingImages.length);
-
-    if (files.length > slotsLeft) {
-      setImageWarning(`Only ${slotsLeft} image${slotsLeft === 1 ? "" : "s"} allowed — extra files were not added.`);
-    } else {
-      setImageWarning("");
-    }
-
-    setNewImageFiles(files.slice(0, slotsLeft));
-    e.target.value = "";
-  };
+  const addNewImages = (files) => setNewImageFiles((prev) => [...prev, ...files]);
 
   const removeNewImage = (fileToRemove) => {
     setNewImageFiles((prev) => prev.filter((file) => file !== fileToRemove));
@@ -102,33 +78,36 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
       .filter((row) => row.value !== "")
       .map((row) => ({ value: Number(row.value), unit: row.unit }));
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("category", category);
-    formData.append("sizes", JSON.stringify(cleanSizes));
-    formData.append("homepageSection", homepageSection);
-
-    if (isEditing) {
-      formData.append("isActive", String(isActive));
-      if (removedPublicIds.length > 0) {
-        formData.append("removeImagePublicIds", JSON.stringify(removedPublicIds));
-      }
-    }
-
-    newImageFiles.forEach((file) => formData.append("images", file));
-
+    const hasUploads = newImageFiles.length > 0;
     setSubmitting(true);
+    setUploadProgress(hasUploads ? 0 : null);
+
     try {
+      const uploaded = await uploadImagesToCloudinary(newImageFiles, setUploadProgress);
+      if (hasUploads) setUploadProgress(100);
+
+      const payload = {
+        title,
+        description,
+        category,
+        sizes: cleanSizes,
+        homepageSection,
+        images: [...remainingExistingImages, ...uploaded],
+      };
       if (isEditing) {
-        await updateProduct(existingProduct._id, formData);
+        payload.isActive = isActive;
+      }
+
+      if (isEditing) {
+        await updateProduct(existingProduct._id, payload);
       } else {
-        await createProduct(formData);
+        await createProduct(payload);
       }
       onSuccess();
     } catch (err) {
       setError(err.message || "Failed to save product.");
       setSubmitting(false);
+      setUploadProgress(null);
     }
   };
 
@@ -263,55 +242,19 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-2 md:col-span-2">
-        <span className="text-sm">Images</span>
-
-        {remainingExistingImages.length > 0 && (
-          <div className="flex flex-wrap gap-3">
-            {remainingExistingImages.map((img) => (
-              <div key={img.publicId} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.url} alt="" className="h-20 w-20 rounded-xs object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeExistingImage(img.publicId)}
-                  aria-label="Remove image"
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black text-xs text-white hover:bg-primary"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
+      <div className="md:col-span-2">
+        <ImageUpload
           multiple
-          onChange={handleFilesChange}
-          className="text-sm"
+          maxFiles={MAX_IMAGES}
+          label="Images"
+          existingImages={remainingExistingImages.map((img) => ({ id: img.publicId, url: img.url }))}
+          newFiles={newImageFiles}
+          onAddFiles={addNewImages}
+          onRemoveExisting={removeExistingImage}
+          onRemoveNew={removeNewImage}
+          uploadProgress={submitting ? uploadProgress : null}
+          disabled={submitting}
         />
-        {imageWarning && <p className="text-sm text-primary-text">{imageWarning}</p>}
-
-        {newImagePreviews.length > 0 && (
-          <div className="flex flex-wrap gap-3">
-            {newImagePreviews.map((preview) => (
-              <div key={preview.url} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={preview.url} alt="" className="h-20 w-20 rounded-xs object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeNewImage(preview.file)}
-                  aria-label="Remove image"
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black text-xs text-white hover:bg-primary"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {isEditing && (
@@ -323,7 +266,15 @@ export default function ProductForm({ existingProduct, onSuccess, onCancel }) {
 
       <div className="flex gap-3 md:col-span-2">
         <Button type="submit" variant="primary" disabled={submitting || noCategories || categoriesStatus === "loading"}>
-          {submitting ? "Saving…" : isEditing ? "Save changes" : "Create product"}
+          {submitting
+            ? uploadProgress !== null
+              ? uploadProgress < 100
+                ? `Uploading… ${uploadProgress}%`
+                : "Processing…"
+              : "Saving…"
+            : isEditing
+              ? "Save changes"
+              : "Create product"}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel

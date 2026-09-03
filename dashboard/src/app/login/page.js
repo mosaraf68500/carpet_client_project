@@ -1,7 +1,7 @@
 import LoginForm from "@/components/auth/LoginForm";
 
 export const metadata = {
-  title: "Admin Login | Doha Furniture أثاث الدوحة",
+  title: "Admin Login | Doha Carpet سجاد الدوحة",
   robots: { index: false, follow: false },
 };
 

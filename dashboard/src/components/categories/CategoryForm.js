@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { createCategory, updateCategory, getCategories } from "@/lib/api";
+import { uploadImagesToCloudinary } from "@/lib/cloudinaryUpload";
 import Button from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/StatusState";
+import ImageUpload from "@/components/common/ImageUpload";
 
 export default function CategoryForm({ existingCategory, onSuccess, onCancel }) {
   const isEditing = Boolean(existingCategory);
@@ -16,8 +18,8 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
     existingCategory?.parentCategory?._id || existingCategory?.parentCategory || ""
   );
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [error, setError] = useState("");
 
   const [parentOptions, setParentOptions] = useState([]);
@@ -45,48 +47,33 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
     };
   }, [existingCategory?._id]);
 
-  // Cleanup only — no setState here, so this isn't a "derive state from an
-  // effect" pattern. The URL itself is created in the file-input's change
-  // handler, an event handler, where side effects are expected.
-  useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-    };
-  }, [imagePreview]);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0] || null;
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImageFile(file);
-    setImagePreview(file ? URL.createObjectURL(file) : "");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("parentCategory", parentCategoryId);
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
-
     setSubmitting(true);
+    setUploadProgress(imageFile ? 0 : null);
+
     try {
+      const payload = { name, parentCategory: parentCategoryId };
+      if (imageFile) {
+        const [uploaded] = await uploadImagesToCloudinary([imageFile], setUploadProgress);
+        setUploadProgress(100);
+        payload.image = uploaded;
+      }
+
       if (isEditing) {
-        await updateCategory(existingCategory._id, formData);
+        await updateCategory(existingCategory._id, payload);
       } else {
-        await createCategory(formData);
+        await createCategory(payload);
       }
       onSuccess();
     } catch (err) {
       setError(err.message || "Failed to save category.");
       setSubmitting(false);
+      setUploadProgress(null);
     }
   };
-
-  const currentImageUrl = imagePreview || existingCategory?.image?.url;
 
   return (
     <form
@@ -140,21 +127,20 @@ export default function CategoryForm({ existingCategory, onSuccess, onCancel }) 
         </select>
       </div>
 
-      <div className="flex flex-col gap-2 md:col-span-2">
-        <span className="text-sm">Image</span>
-        {currentImageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={currentImageUrl} alt="" className="h-20 w-20 rounded-xs object-cover" />
-        )}
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={handleFileChange}
-          className="text-sm"
+      <div className="md:col-span-2">
+        <ImageUpload
+          label="Image"
+          existingImages={
+            !imageFile && existingCategory?.image?.url
+              ? [{ id: existingCategory.image.publicId, url: existingCategory.image.url }]
+              : []
+          }
+          newFiles={imageFile ? [imageFile] : []}
+          onAddFiles={(files) => setImageFile(files[0])}
+          onRemoveNew={() => setImageFile(null)}
+          uploadProgress={submitting ? uploadProgress : null}
+          disabled={submitting}
         />
-        {isEditing && !imageFile && (
-          <p className="text-xs text-text-light">Choose a file to replace the current image.</p>
-        )}
       </div>
 
       <div className="flex gap-3 md:col-span-2">

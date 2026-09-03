@@ -1,4 +1,4 @@
-// Single source of truth for calling the Doha Furniture admin API.
+// Single source of truth for calling the Doha Carpet admin API.
 // No other file in this project should call fetch() directly against the
 // backend — import the functions below instead, so auth headers, error
 // handling, and the base URL only ever need to be maintained in one place.
@@ -7,14 +7,14 @@ import { getToken } from "./auth";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+// Images now upload straight from the browser to Cloudinary (see
+// lib/cloudinaryUpload.js) — every backend call here is a plain JSON
+// request, so this no longer needs a FormData/upload-progress path.
 async function request(path, options = {}) {
-  const { body, isFormData, headers, ...rest } = options;
+  const { body, headers, ...rest } = options;
   const token = getToken();
 
-  const finalHeaders = { ...headers };
-  if (!isFormData) {
-    finalHeaders["Content-Type"] = "application/json";
-  }
+  const finalHeaders = { "Content-Type": "application/json", ...headers };
   if (token) {
     finalHeaders["Authorization"] = `Bearer ${token}`;
   }
@@ -22,7 +22,7 @@ async function request(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     ...rest,
     headers: finalHeaders,
-    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   const isJson = res.headers.get("content-type")?.includes("application/json");
@@ -51,12 +51,12 @@ export function getCategories() {
   return request("/categories", { method: "GET" });
 }
 
-export function createCategory(formData) {
-  return request("/categories", { method: "POST", body: formData, isFormData: true });
+export function createCategory(payload) {
+  return request("/categories", { method: "POST", body: payload });
 }
 
-export function updateCategory(id, formData) {
-  return request(`/categories/${id}`, { method: "PUT", body: formData, isFormData: true });
+export function updateCategory(id, payload) {
+  return request(`/categories/${id}`, { method: "PUT", body: payload });
 }
 
 export function deleteCategory(id) {
@@ -73,12 +73,12 @@ export function getAdminProducts({ page, limit } = {}) {
   return request(`/products/admin/all${query ? `?${query}` : ""}`, { method: "GET" });
 }
 
-export function createProduct(formData) {
-  return request("/products", { method: "POST", body: formData, isFormData: true });
+export function createProduct(payload) {
+  return request("/products", { method: "POST", body: payload });
 }
 
-export function updateProduct(id, formData) {
-  return request(`/products/${id}`, { method: "PUT", body: formData, isFormData: true });
+export function updateProduct(id, payload) {
+  return request(`/products/${id}`, { method: "PUT", body: payload });
 }
 
 export function deleteProduct(id) {
@@ -91,12 +91,12 @@ export function getAdminServices() {
   return request("/services/admin/all", { method: "GET" });
 }
 
-export function createService(formData) {
-  return request("/services", { method: "POST", body: formData, isFormData: true });
+export function createService(payload) {
+  return request("/services", { method: "POST", body: payload });
 }
 
-export function updateService(id, formData) {
-  return request(`/services/${id}`, { method: "PUT", body: formData, isFormData: true });
+export function updateService(id, payload) {
+  return request(`/services/${id}`, { method: "PUT", body: payload });
 }
 
 export function deleteService(id) {
@@ -120,6 +120,24 @@ export function markMessageRead(id) {
 
 export function deleteMessage(id) {
   return request(`/contact/${id}`, { method: "DELETE" });
+}
+
+// ---- Appointments ----
+
+export function getAppointments({ page, limit } = {}) {
+  const params = new URLSearchParams();
+  if (page) params.set("page", page);
+  if (limit) params.set("limit", limit);
+  const query = params.toString();
+  return request(`/appointments${query ? `?${query}` : ""}`, { method: "GET" });
+}
+
+export function updateAppointmentStatus(id, status) {
+  return request(`/appointments/${id}`, { method: "PATCH", body: { status } });
+}
+
+export function deleteAppointment(id) {
+  return request(`/appointments/${id}`, { method: "DELETE" });
 }
 
 // ---- Settings ----
