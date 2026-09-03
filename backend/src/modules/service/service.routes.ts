@@ -22,11 +22,15 @@ router.get("/:slug", getServiceBySlug);
 
 // "image" = hero banner, "contentImage" = the 2nd section's related photo,
 // "slideImages" = the multi-image slideshow shown above "Our Promise" —
-// independent file fields, so .fields() replaces .single()/.array().
+// independent file fields, so .fields() replaces .single()/.array(). No
+// real cap on how many slides a service can have (the client wants
+// "as many as they want"); multer still needs a concrete number, so this
+// is set high enough to be effectively unlimited for a real editor rather
+// than an actual intended limit.
 const serviceImageUpload = upload.fields([
   { name: "image", maxCount: 1 },
   { name: "contentImage", maxCount: 1 },
-  { name: "slideImages", maxCount: 8 },
+  { name: "slideImages", maxCount: 50 },
 ]);
 
 router.post("/", protect, serviceImageUpload, createService);

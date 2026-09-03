@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createService, updateService } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/StatusState";
 
-const MAX_SLIDE_IMAGES = 8;
+// No real cap on how many slides an editor can add ("as many as they
+// want") — this just keeps a sane upper bound rather than being an actual
+// intended limit; matches the backend route's multer maxCount.
+const MAX_SLIDE_IMAGES = 50;
 
 // Field order matches how the real service page renders, top to bottom:
 // Name (hero overlay + page heading) -> Hero Image (hero banner) ->
@@ -33,6 +36,14 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Native <input type="file"> is visually hidden (see the "Upload Image"
+  // buttons below) — these refs are how the buttons open the real file
+  // picker instead of relying on <label htmlFor>, which doesn't play well
+  // with the shared Button component's own <button> element.
+  const heroImageInputRef = useRef(null);
+  const contentImageInputRef = useRef(null);
+  const slideImageInputRef = useRef(null);
 
   // Cleanup only — no setState here, so this isn't a "derive state from an
   // effect" pattern. The URLs themselves are created in the file inputs'
@@ -74,17 +85,20 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
     };
   }, [newSlideFiles]);
 
+  // Appends to the existing selection rather than replacing it — an editor
+  // picking one image, seeing it added, then opening the picker again for
+  // another should end up with both, not just the most recent pick.
   const handleSlideFilesChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    const slotsLeft = Math.max(0, MAX_SLIDE_IMAGES - remainingExistingSlides.length);
+    const pickedFiles = Array.from(e.target.files || []);
+    const slotsLeft = Math.max(0, MAX_SLIDE_IMAGES - remainingExistingSlides.length - newSlideFiles.length);
 
-    if (files.length > slotsLeft) {
-      setSlideImageWarning(`Only ${slotsLeft} image${slotsLeft === 1 ? "" : "s"} allowed — extra files were not added.`);
+    if (pickedFiles.length > slotsLeft) {
+      setSlideImageWarning(`Only ${slotsLeft} more image${slotsLeft === 1 ? "" : "s"} allowed — extra files were not added.`);
     } else {
       setSlideImageWarning("");
     }
 
-    setNewSlideFiles(files.slice(0, slotsLeft));
+    setNewSlideFiles((prev) => [...prev, ...pickedFiles.slice(0, slotsLeft)]);
     e.target.value = "";
   };
 
@@ -168,11 +182,16 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
           <img src={currentHeroImageUrl} alt="" className="h-20 w-20 rounded-xs object-cover" />
         )}
         <input
+          ref={heroImageInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleImageChange}
-          className="text-sm"
+          className="hidden"
         />
+        <Button type="button" variant="secondary" className="self-start" onClick={() => heroImageInputRef.current?.click()}>
+          Upload Image
+        </Button>
+        {imageFile && <p className="text-xs text-text-light">Selected: {imageFile.name}</p>}
         {isEditing && !imageFile && (
           <p className="text-xs text-text-light">Choose a file to replace the current hero image.</p>
         )}
@@ -212,11 +231,21 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
           <img src={currentContentImageUrl} alt="" className="h-20 w-20 rounded-xs object-cover" />
         )}
         <input
+          ref={contentImageInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleContentImageChange}
-          className="text-sm"
+          className="hidden"
         />
+        <Button
+          type="button"
+          variant="secondary"
+          className="self-start"
+          onClick={() => contentImageInputRef.current?.click()}
+        >
+          Upload Image
+        </Button>
+        {contentImageFile && <p className="text-xs text-text-light">Selected: {contentImageFile.name}</p>}
         {isEditing && !contentImageFile && (
           <p className="text-xs text-text-light">Choose a file to replace the current image.</p>
         )}
@@ -225,7 +254,8 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
       <div className="flex flex-col gap-2 md:col-span-2">
         <span className="text-sm">Slide Image</span>
         <p className="text-xs text-text-light">
-          Shown as a slideshow above &quot;Our Promise&quot; on the service page. Add multiple images.
+          Shown as a slideshow above &quot;Our Promise&quot; on the service page. Add as many as you like — one at a
+          time or several at once.
         </p>
 
         {remainingExistingSlides.length > 0 && (
@@ -248,12 +278,21 @@ export default function ServiceForm({ existingService, onSuccess, onCancel }) {
         )}
 
         <input
+          ref={slideImageInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           multiple
           onChange={handleSlideFilesChange}
-          className="text-sm"
+          className="hidden"
         />
+        <Button
+          type="button"
+          variant="secondary"
+          className="self-start"
+          onClick={() => slideImageInputRef.current?.click()}
+        >
+          Upload Image
+        </Button>
         {slideImageWarning && <p className="text-sm text-primary-text">{slideImageWarning}</p>}
 
         {newSlidePreviews.length > 0 && (
