@@ -2,7 +2,7 @@ import "dotenv/config";
 import app from "./app.js";
 import { connectDB } from "./common/config/db.js";
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 async function start(): Promise<void> {
   await connectDB();

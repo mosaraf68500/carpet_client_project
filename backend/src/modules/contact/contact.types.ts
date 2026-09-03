@@ -4,6 +4,7 @@ export interface CreateMessageBody {
   email?: string;
   message?: string;
   productId?: string;
+  source?: string;
 }
 
 export interface CreateMessageResponse {

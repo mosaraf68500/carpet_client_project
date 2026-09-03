@@ -12,11 +12,12 @@ import productRoutes from "./modules/product/product.routes.js";
 import serviceRoutes from "./modules/service/service.routes.js";
 import contactRoutes from "./modules/contact/contact.routes.js";
 import settingsRoutes from "./modules/settings/settings.routes.js";
+import appointmentRoutes from "./modules/appointment/appointment.routes.js";
 
-// All six modules (auth, category, product, service, contact, settings)
-// have been migrated to TypeScript; the legacy JS backend (config/,
-// models/, controllers/, routes/, middleware/, utils/, seed/, server.js)
-// has been deleted.
+// All modules (auth, category, product, service, contact, settings,
+// appointment) are TypeScript; the legacy JS backend (config/, models/,
+// controllers/, routes/, middleware/, utils/, seed/, server.js) has been
+// deleted.
 
 const app = express();
 
@@ -32,7 +33,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (_req: Request, res: Response) =>
-  res.json({ status: "ok", service: "doha-furniture-backend" })
+  res.json({ status: "ok", service: "doha-carpet-backend" })
 );
 app.get("/health", (_req: Request, res: Response) => res.json({ status: "ok" }));
 
@@ -42,6 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -65,7 +65,7 @@ interface OpenverseResult {
 async function searchOpenverse(query: string): Promise<OpenverseResult[]> {
   const url = `${OPENVERSE_SEARCH_URL}?q=${encodeURIComponent(query)}&license_type=commercial&size=large`;
   const res = await fetch(url, {
-    headers: { "User-Agent": "DohaFurnitureDemoSeedScript/1.0 (one-off local seed script)" },
+    headers: { "User-Agent": "DohaCarpetDemoSeedScript/1.0 (one-off local seed script)" },
   });
   if (!res.ok) {
     console.warn(`  Openverse search failed for "${query}": ${res.status} ${res.statusText}`);

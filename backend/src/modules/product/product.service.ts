@@ -26,6 +26,19 @@ export interface UpdateProductInput extends UpdateProductBody {
 const HOMEPAGE_SECTIONS = ["bestselling", "curated", "spotlight"] as const;
 type HomepageSection = (typeof HOMEPAGE_SECTIONS)[number];
 
+// Below this many characters a search query is too noisy to be useful (and
+// the frontend's own debounce never sends one this short anyway) — treated
+// as "no search" rather than a 400, so a direct API call with a short/empty
+// `search` param just falls back to the regular listing instead of erroring.
+const MIN_SEARCH_LENGTH = 2;
+
+// Escapes regex metacharacters in raw user input before it's used to build
+// a RegExp — without this, a search for e.g. "8x10 (blue)" would throw
+// (unbalanced parenthesis) instead of matching literally.
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 // "" / "none" (what a dashboard select sends for its default option) both
 // normalize to null, same pattern as category.service.ts's
 // resolveParentCategory. Anything else must be one of the 3 known values —
@@ -41,7 +54,7 @@ function resolveHomepageSection(value?: string): HomepageSection | null {
 }
 
 export async function getProducts(query: ProductQuery): Promise<PaginatedResult<IProduct>> {
-  const { category, unit, minSize, maxSize, homepageSection, page = "1", limit = "12" } = query;
+  const { category, unit, minSize, maxSize, homepageSection, search, page = "1", limit = "12" } = query;
 
   const pageNum = Math.max(1, Number(page));
   const limitNum = Math.max(1, Number(limit));
@@ -73,6 +86,16 @@ export async function getProducts(query: ProductQuery): Promise<PaginatedResult<
 
   if (homepageSection) {
     filter.homepageSection = homepageSection;
+  }
+
+  // Case-insensitive partial match on title/description — regex rather than
+  // a MongoDB $text index, since $text only matches whole (stemmed) words
+  // and this is a type-as-you-go search box where "kash" must already match
+  // "Kashmir" before the user finishes typing it.
+  const trimmedSearch = search?.trim();
+  if (trimmedSearch && trimmedSearch.length >= MIN_SEARCH_LENGTH) {
+    const pattern = new RegExp(escapeRegExp(trimmedSearch), "i");
+    filter.$or = [{ title: pattern }, { description: pattern }];
   }
 
   // Homepage-section queries sort by most-recently-updated so tagging a

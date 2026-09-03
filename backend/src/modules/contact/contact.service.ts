@@ -13,7 +13,7 @@ import type {
 // testable independently of Express.
 
 export async function createMessage(data: CreateMessageBody): Promise<CreateMessageResponse> {
-  const { name, phone, email, message, productId } = data;
+  const { name, phone, email, message, productId, source } = data;
 
   if (!name || !phone || !email) {
     throw new HttpError("Name, phone, and email are required", 400);
@@ -26,12 +26,18 @@ export async function createMessage(data: CreateMessageBody): Promise<CreateMess
     productTitle = product?.title;
   }
 
+  // Anything other than the one recognized alternate value falls back to
+  // the default rather than a 400, since this only distinguishes which
+  // frontend form submitted it — not worth rejecting a request over.
+  const resolvedSource = source === "quote" ? "quote" : "contact";
+
   const doc = await ContactMessage.create({
     name,
     phone,
     email,
     message,
     product: product?._id || null,
+    source: resolvedSource,
   });
 
   // fire-and-forget — a slow/broken SMTP server should never block the user's submission

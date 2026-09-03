@@ -29,6 +29,7 @@ export interface ProductQuery {
   minSize?: string;
   maxSize?: string;
   homepageSection?: string;
+  search?: string;
   page?: string;
   limit?: string;
 }

@@ -1,4 +1,4 @@
-# Doha Furniture — Backend
+# Doha Carpet — Backend
 
 Express + MongoDB (Mongoose) API, written in TypeScript with a NestJS-style
 feature-module layout (plain Express, no Nest framework).
@@ -9,7 +9,7 @@ feature-module layout (plain Express, no Nest framework).
 npm install
 cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, Cloudinary keys, SMTP
 npm run seed:admin     # creates the one admin login from ADMIN_EMAIL/ADMIN_PASSWORD
-npm run dev            # http://localhost:5000 (tsx watch, hot reload)
+npm run dev            # http://localhost:8000 (tsx watch, hot reload)
 npm run build           # tsc -> dist/
 npm start                # node dist/server.js (run build first)
 ```
@@ -25,6 +25,7 @@ src/
     service/    Installation/Fixing/Delivery resource, /api/services
     contact/    quote-form submissions, /api/contact
     settings/   site-wide contact info singleton, /api/settings
+    appointment/ book-an-appointment submissions, /api/appointments
   common/
     config/     db.ts (Mongo connection), cloudinary.ts (SDK config)
     middleware/ auth.middleware.ts (JWT guard), upload.middleware.ts
@@ -72,17 +73,24 @@ on every protected route.
 | DELETE | /api/contact/:id | JWT | |
 | GET | /api/settings | — | phone/whatsapp/email/address |
 | PUT | /api/settings | JWT | |
+| POST | /api/appointments | — | book-an-appointment form submit |
+| GET | /api/appointments | JWT | list, paginated |
+| PATCH | /api/appointments/:id | JWT | update `status` |
+| DELETE | /api/appointments/:id | JWT | |
 
 ## Images
 
-Uploaded files go straight to Cloudinary (folder `doha-furniture`) via a
+Uploaded files go straight to Cloudinary (folder `doha-carpet`) via a
 small custom multer storage engine (`src/common/utils/cloudinaryStorage.ts`)
 — the official `multer-storage-cloudinary` package only supports the old
-Cloudinary v1 SDK, so this avoids a version conflict.
+Cloudinary v1 SDK, so this avoids a version conflict. (26 images uploaded
+before the Doha Carpet rename still live under the old `doha-furniture/`
+folder — they were left in place rather than moved, since that would break
+their existing URLs.)
 
 ## Next step
 
 Point the frontend's `src/lib/api.js` and the dashboard's `src/lib/api.js`
-at `NEXT_PUBLIC_API_URL=http://localhost:5000/api` and swap the mock-data
+at `NEXT_PUBLIC_API_URL=http://localhost:8000/api` and swap the mock-data
 functions for real `fetch()` calls to these routes — the response shapes
 already match what both were built against.
